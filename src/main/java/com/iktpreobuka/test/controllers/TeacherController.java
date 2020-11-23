@@ -136,7 +136,6 @@ public class TeacherController {
 						HttpStatus.BAD_REQUEST);
 			}	
 		
-//ako već posotji kao druga rola:*********
 			UserEntity user = userRepository.findByJmbg(newTeacher.getJmbg());
 			if(user != null) {
 			
@@ -182,7 +181,6 @@ public class TeacherController {
 				return new ResponseEntity<>("Teacher was successfully recorded", HttpStatus.OK);	
 				
 			}	
-//*******	
 			
 			TeacherEntity teacher = new TeacherEntity();
 			teacher.setFirstName(newTeacher.getFirstName());
@@ -258,13 +256,7 @@ public class TeacherController {
 			if (updateTeacher.getDateOfBirth() != null) {
 				teacher.setDateOfBirth(updateTeacher.getDateOfBirth());
 			}
-/*na front ovo koristim a ne posebnu metodu za dodavanje predmeta			
-			  for(Integer subjectId : updateTeacher.getSubjectsId()) {
-				  SubjectEntity subject = subjectRepository.findById(subjectId).orElse(null);
-			 	if(!teacher.getSubjects().contains(subject)){
-			  		teacher.getSubjects().add(subject); 
-			 	}
-			  }*/
+
 			teacherRepository.save(teacher);
 
 			logger.info("TeacherController - updateTeacher - finished.");
@@ -276,7 +268,6 @@ public class TeacherController {
 		}
 	}
 	
-// dodavanje predmeta:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-subject/{subjectId}")
 //	@JsonView(Views.Admin.class)
@@ -309,8 +300,6 @@ public class TeacherController {
 		}
 	}
 
-//DA LI JE OK ili se to radi kod Lecture?
-// dodavanje predaje:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-lecture/{lectureId}")
 //	@JsonView(Views.Admin.class)
@@ -349,7 +338,6 @@ public class TeacherController {
 	}
 
 
-//ako ništa ne referencira, briši (mada ne dozvoljava account)	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -362,8 +350,7 @@ public class TeacherController {
 				return new ResponseEntity<RESTError>(new RESTError("Teacher with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-
-			// provera da li neko predavanje referencira tog nastavnika:
+			
 			Iterable<LectureEntity> lectures = lectureRepository.findAll();
 			for (LectureEntity lecture : lectures) {
 				if (lecture.getTeacher().equals(teacher))
@@ -371,7 +358,6 @@ public class TeacherController {
 							new RESTError("Teacher cannot be deleted because some lecture has a reference to it"),
 							HttpStatus.BAD_REQUEST);
 			}
-			// provera da li neki predmet referencira tog nastavnika:
 			Iterable<SubjectEntity> subjects = subjectRepository.findAll();
 			for (SubjectEntity subject : subjects) {
 				if (subject.getTeachers().contains(teacher))
@@ -380,17 +366,11 @@ public class TeacherController {
 							HttpStatus.BAD_REQUEST);
 			}
 
-// OVO ILI TO ISPOD?????
-//provera da li je to korisnik nekog naloga:
 			if(accountRepository.findByUserAndRole((UserEntity)teacher, EUserRole.ROLE_TEACHER)!=null)
 				return new ResponseEntity<RESTError>(new RESTError("The teacher have account so you can't delete him."),HttpStatus.BAD_REQUEST);
 
-//OVO DOLE ILI OVO GORE??????
-//ako se nastavnik ne pojavljuje kod predmeta ni u predaje, mogu ga brisati ali mu brisem i nalog(KAKO? prijavljuje NullPointerException)
 			AccountEntity account = accountRepository.findByUserAndRole((UserEntity)teacher, EUserRole.ROLE_TEACHER);
-//		UserEntity user = (UserEntity)teacher;
-//		user.getAccounts().remove(account);
-//		userRepository.save(user);
+
 			try {
 				teacherRepository.delete(teacher);
 			}
@@ -403,14 +383,7 @@ public class TeacherController {
 			catch(Exception e) {
 				return new ResponseEntity<RESTError>(new RESTError("Problem when try delete account that has user"),HttpStatus.BAD_REQUEST);
 			}
-/*		
-		teacher.getAccount().clear();
-		teacher.getLectures().clear();
-		teacher.getSubjects().clear();
-		
-//		UserEntity user = (UserEntity)teacher;
-//		accountRepository.delete(accountRepository.findByUserAndRole(user, EUserRole.ROLE_TEACHER));
-*/	
+
 			teacherRepository.deleteById(id);
 		
 			logger.info("TeacherController - deleteTeacher - finished.");
@@ -422,9 +395,6 @@ public class TeacherController {
 		}
 	}
 	
-
-
-//ako ništa ne referencira, briši (mada ne dozvoljava account)	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "delete/{id}")
 //	@JsonView(Views.Admin.class)
@@ -439,7 +409,6 @@ public class TeacherController {
 						HttpStatus.NOT_FOUND);
 			}
 
-			// provera da li neko predavanje referencira tog nastavnika:
 			Iterable<LectureEntity> lectures = lectureRepository.findAll();
 			for (LectureEntity lecture : lectures) {
 				if (lecture.getTeacher().equals(teacher)) {
@@ -449,7 +418,6 @@ public class TeacherController {
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-			// provera da li neki predmet referencira tog nastavnika:
 			Iterable<SubjectEntity> subjects = subjectRepository.findAll();
 			for (SubjectEntity subject : subjects) {
 				if (subject.getTeachers().contains(teacher)) {
@@ -484,8 +452,6 @@ public class TeacherController {
 				return new ResponseEntity<RESTError>(new RESTError("Problem when try delete account that has user"),HttpStatus.BAD_REQUEST);
 			}
 
-			//teacherRepository.deleteById(id);
-			
 			logger.info("TeacherController - deleteTeacherAndAccount - finished.");
 			return new ResponseEntity<TeacherEntity>(teacher, HttpStatus.OK);
 		}
@@ -494,10 +460,7 @@ public class TeacherController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-		
 
-// front:
-	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.GET, value = "/subject/{subjectId}")
 //	@JsonView(Views.Admin.class)
@@ -524,53 +487,7 @@ public class TeacherController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-		
-		
-		
-		
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-// da li je ok:	
-	//deaktivacija:(brisanje, CascadeType.All na sve veze staviti!)
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")	
 	//@JsonView(Views.Admin.class)

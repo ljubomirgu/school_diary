@@ -20,6 +20,5 @@ public interface StudentRepository extends CrudRepository<StudentEntity, Integer
 	@Query(value="insert into student (date_of_entry, note,student_id, school_class) values ( :dateEntered, :note, :userId, :classId)",nativeQuery = true)
 	void insertNewStudent(@Param("dateEntered") Date dateEntered, @Param("note") String note, @Param("userId") Integer userId, @Param("classId") Integer classId);
 	
-//	public StudentEntity findByJmbg(String jmbg);
 
 }

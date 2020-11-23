@@ -23,7 +23,6 @@ import com.iktpreobuka.test.security.Views;
 @Entity
 @Table(name = "parent")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-//@DiscriminatorValue("parent")
 @PrimaryKeyJoinColumn(name = "parentId")
 public class ParentEntity extends UserEntity {
 	
@@ -34,7 +33,7 @@ public class ParentEntity extends UserEntity {
 	
 	@JsonManagedReference(value="parent-student")
 //	@JsonIgnore
-//	@JsonView(Views.Parent.class)  //?????????????????????????
+//	@JsonView(Views.Parent.class)
 	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
 	@JoinTable(name = "Parent_student", joinColumns =
 	{@JoinColumn(name = "Parent_id", nullable = false, updatable = false) },

@@ -64,14 +64,6 @@ public class UserEntity {
 //	@Size(min = 13, max = 13, message = "JMBG must be {min}  characters long.")
 	private String jmbg;
 
-	/*
-	 * ne treba i ovde role?:
-	 * 
-	 * @Enumerated(EnumType.STRING) 
-	 * @Column(name = "role",length=50) 
-	 * @NotNull(message = "Role must be provided.") 
-	 * private EUserRole role;
-	 */
 	@JsonView(Views.Admin.class)
 //	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")

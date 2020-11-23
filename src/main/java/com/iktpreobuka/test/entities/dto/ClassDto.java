@@ -23,13 +23,6 @@ public class ClassDto {
 	public ClassDto() {
 		super();
 	}
-/*
-	public ClassDto(String numberOfDepartment,String year) {
-		super();
-		this.numberOfDepartment = numberOfDepartment;
-		this.year = year;
-	}
-*/
 	public ClassDto(String numberOfDepartment, Integer yearId, String schoolYear) {
 		super();
 		this.numberOfDepartment = numberOfDepartment;
@@ -37,11 +30,6 @@ public class ClassDto {
 		this.schoolYear=schoolYear;
 	}
 
-/*	public ClassDto (String numberOfDepartment) {
-		super();
-		this.numberOfDepartment = numberOfDepartment;
-	}
-*/	
 	public String getNumberOfDepartment() {
 		return numberOfDepartment;
 	}

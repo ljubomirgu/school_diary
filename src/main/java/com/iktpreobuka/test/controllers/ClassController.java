@@ -186,7 +186,7 @@ public class ClassController {
 				return new ResponseEntity<RESTError>(new RESTError("Class with provided ID not found."),
 					HttpStatus.NOT_FOUND);
 			}
-			//zbog duplikata ( ne radi uniquConstraint)****		
+			
 			if(updateClass.getNumberOfDepartment()!=null && updateClass.getSchoolYear()==null && updateClass.getYearId()==null) {
 				
 				if(classRepository.findByYearAndNumberOfDepartmentAndSchoolYear(schoolClass.getYear(),
@@ -256,8 +256,6 @@ public class ClassController {
 				return new ResponseEntity<RESTError>(new RESTError("You need to create new class, not update some which exists."), HttpStatus.BAD_REQUEST);
 
 			}
-			//***
-			
 
 			if (StringUtils.isNotBlank(updateClass.getNumberOfDepartment())) {
 				schoolClass.setNumberOfDepartment(updateClass.getNumberOfDepartment());
@@ -268,14 +266,7 @@ public class ClassController {
 			YearEntity year = yearRepository.findById(updateClass.getYearId()).orElse(null);
 			if(year!= null)
 				schoolClass.setYear(year);
-		
-/*	provera duplikata:
-		ClassEntity  schoolClasss =classRepository.findByYearAndNumberOfDepartmentAndSchoolYear(updateClass.getYear(),
-				 updateClass.getNumberOfDepartment(),updateClass.getSchoolYear());
-		if(schoolClasss != null)
-			return new ResponseEntity<RESTError>(new RESTError("Class already exists."),HttpStatus.BAD_REQUEST);
-*/	
-	
+
 			logger.info("ClassController - updateClass - finished.");
 			return new ResponseEntity<ClassEntity>(classRepository.save(schoolClass), HttpStatus.OK);
 		}
@@ -286,7 +277,6 @@ public class ClassController {
 		}
 	}
 
-// dodaj učenika(nema smisla - postoji u studentControlleru - changeClass)
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-student/{studentId}")
 //	@JsonView(Views.Admin.class)
@@ -318,7 +308,6 @@ public class ClassController {
 		}
 	}
 	
-	// dodaj predaje:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-lecture/{lectureId}")
 //	@JsonView(Views.Admin.class)
@@ -381,17 +370,7 @@ public class ClassController {
 					return new ResponseEntity<RESTError>(new RESTError("The class cannot be deleted."),
 							HttpStatus.BAD_REQUEST);
 				}
-
-/*ako ni jedan učenik niti predaje ne referenciraju ovo odeljenje, može se obrisati
-			// treba li ova provera jer u tabeli year nemam class???:
-			Iterable<YearEntity> years = yearRepository.findAll();
-			for (YearEntity year : years)
-				if (year.getClasses().contains(schoolClass)) {
-					logger.info("ClassController - deleteClass - class cannot be deleted.");
-					return new ResponseEntity<RESTError>(new RESTError("The class cannot be deleted."),
-							HttpStatus.BAD_REQUEST);
-				}
-*/			classRepository.deleteById(id);
+			classRepository.deleteById(id);
 
 			logger.info("ClassController - deleteClass - finished.");
 			return new ResponseEntity<ClassEntity>(schoolClass, HttpStatus.OK);
@@ -406,7 +385,6 @@ public class ClassController {
 	
 	
 	
-// front
 	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.GET, value = "/by-year/{yearId}")
@@ -451,8 +429,6 @@ public class ClassController {
 			} else {
 				
 				Iterable<ClassEntity> classes = new ArrayList<>();
-			//	for(ClassEntity schoolClass :classRepository.findAllBySubjectId(subjectId) )
-			//		((ArrayList<ClassEntity>) classes).add(schoolClass);
 				((ArrayList<ClassEntity>) classes).addAll(classRepository.findAllBySubjectId(subjectId));
 						
 				logger.info("ClassController - findClassById - finished.");
@@ -484,8 +460,6 @@ public class ClassController {
 			else {
 				
 				Iterable<ClassEntity> classes = new ArrayList<>();
-			//	for(ClassEntity schoolClass :classRepository.findAllBySubjectId(subjectId) )
-			//		((ArrayList<ClassEntity>) classes).add(schoolClass);
 				((ArrayList<ClassEntity>) classes).addAll(classRepository.findAllBySubjectIdAndTeacherId(subjectId, teacherId));
 						
 				logger.info("ClassController - findClassesBySubjectIdAndTeacherId - finished.");
@@ -495,36 +469,6 @@ public class ClassController {
 			logger.info("ClassController - findClassesBySubjectIdAndTeacherId - internal server error.");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 	
 }

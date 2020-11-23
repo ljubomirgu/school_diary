@@ -22,11 +22,7 @@ public class UserDto {
 //	@NotNull(message = "JMBG   must be provided.")
 	@Size(min=13, max=13, message = "JMBG must be {min}  characters long.")
 	private String jmbg;
-/*	
-	@NotNull(message = "Role must be provided.")
-	private EUserRole role;
-*/	
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 //	@NotNull(message = "Date of birth must be provided UserDto.")
 //	@Past(message = "The date of birth must be a date from the past")

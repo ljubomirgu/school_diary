@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.iktpreobuka.test.controllers.util.RESTError;
 import com.iktpreobuka.test.entities.AccountEntity;
 import com.iktpreobuka.test.entities.ParentEntity;
@@ -85,9 +84,7 @@ public class ParentController {
 		}
 	}
 
-//verzija sa komentarima	
 	@Secured("ROLE_ADMIN")
-	//@RequestMapping(method = RequestMethod.POST)
 //	@JsonView(Views.Admin.class)
 	public ResponseEntity<?> addNewParent1(@Valid @RequestBody ParentDto newParent, BindingResult result) {
 		logger.info("ParentController - addNewParent - starts.");
@@ -102,7 +99,6 @@ public class ParentController {
 				return new ResponseEntity<RESTError>(new RESTError("Parent object is invalid."),HttpStatus.BAD_REQUEST);
 			}
 
-//da bih dodao roditlje proveravam da li je neki učenik njegovo dete:
 			List<StudentEntity> students = new ArrayList<>();
 			for(Integer studentId : newParent.getStudentsId()) {	
 				StudentEntity student = studentRepository.findById(studentId).orElse(null);
@@ -123,7 +119,6 @@ public class ParentController {
 				return new ResponseEntity<RESTError>(new RESTError("Parent object is invalid."),HttpStatus.BAD_REQUEST);
 			}		
 
-//********* ako već posotji kao user:
 			UserEntity user = userRepository.findByJmbg(newParent.getJmbg());
 			if(user != null) {
 				ParentEntity parentExists = parentRepository.findById(user.getUserId()).orElse(null);
@@ -148,20 +143,11 @@ public class ParentController {
 					logger.info("ParentController - addNewParent - insert query is incorect.");
 					return new ResponseEntity<RESTError>(new RESTError("Query is invalid"),HttpStatus.BAD_REQUEST);
 				}
-/*			ParentEntity parent = new ParentEntity();
-			parent.setFirstName(newParent.getFirstName());
-			parent.setLastName(newParent.getLastName());
-			parent.setJmbg(newParent.getJmbg());
-			parent.setEmail(newParent.getEmail());
-			parent.setDateOfBirth(newParent.getDateOfBirth());
-			parent.setStudents(students);
-*/			
-						
+				
 				try {	
 					accountDao.createAndSaveAccount(newParent.getUsername(), newParent.getPassword(), user, EUserRole.ROLE_PARENT);
 				
 				}
-// da li da brišem roditelja ako ne uspe kreiranje accounta ili da napišem kod koji će kreirati samo roditelja pa reći da account nije kreiran i da treba ručno kreirati account?:
 				catch (Exception e) {
 					parentRepository.deleteById(user.getUserId());
 					logger.info("ParentController - addNewParent - account and parent not recorded.");
@@ -174,52 +160,10 @@ public class ParentController {
 				logger.info("ParentController - addNewParent - finished.");
 				return new ResponseEntity<>("Parent was recorded", HttpStatus.OK);	
 
-			} // i ovo obrisati	
-			
-			
-/*			//obrisati
-			
-		ParentEntity parentSecondRole = parentRepository.findByJmbg(newParent.getJmbg());
+			} 			
 
-			if(parentSecondRole == null) 
-//				return new ResponseEntity<RESTError>(new RESTError("Ne postoji taj novi roditelj sa id-jem (starog)usera."),
-//						HttpStatus.NOT_FOUND);
-				return new ResponseEntity<RESTError>(new RESTError("Ne postoji taj novi roditelj sa jmbg."),
-						HttpStatus.NOT_FOUND);
-			for(StudentEntity student: students) {
-				student.getParents().add(parentSecondRole);
-			}
-			studentRepository.saveAll(students);
-/*
-//već provereno gore da li je lista dece prazna, pa je višak:
-			if(parent.getStudents().isEmpty()){
-				parentRepository.deleteById(parent.getUserId());
-				return new ResponseEntity<RESTError>(new RESTError("Parent not added, nema dece"),	HttpStatus.BAD_REQUEST);
-			}
-//ovde bespotrebno jer već imam tog usera gore:			
-			UserEntity userP = (UserEntity)parent;
-			s
-ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije 			
-			try {	
-				accountDao.createAndSaveAccount(newParent.getUsername(), newParent.getPassword(), user, EUserRole.ROLE_PARENT);
-			}
-	// da li da brišem roditelja ako ne uspe kreiranje accounta ili da napišem kod koji će kreirati samo
-	// roditelja pa reći da account nije kreiran i da treba ručno kreirati account?:
-			catch (Exception e) {
-				parentRepository.deleteById(user.getUserId());
-				return new ResponseEntity<RESTError>(new RESTError("Account for second role not created and parent not added"),	HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-			
-			
-			logger.info("ParentController - addNewParent - finished.");
-			return new ResponseEntity<ParentEntity>(parentSecondRole, HttpStatus.OK);	
-		
-		}
-	*/	
 			else {
-		
-//*********		
-		
+			
 				ParentEntity parent = new ParentEntity();
 				parent.setFirstName(newParent.getFirstName());
 				parent.setLastName(newParent.getLastName());
@@ -229,41 +173,20 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				parent.setStudents(students);
 
 				parentRepository.save(parent);
-		
-/*	profesor reče ne treba, automatski se to odradi:	
-// dodavanje tog roditelja deci:
-		for( StudentEntity student : parent.getStudents()) {
-			try {
-				student.getParents().add(parent);
-				studentRepository.save(student);
-			}
-			catch(Exception e){
-				parent.getStudents().remove(parent.getStudents().indexOf(student));
-				parentRepository.save(parent);
-			}
-		}
-*/
+
 				UserEntity userP = (UserEntity)parent;
 		
 				try {	
 					accountDao.createAndSaveAccount(newParent.getUsername(), newParent.getPassword(), userP, EUserRole.ROLE_PARENT);
 				}
-// da li da brišem roditelja ako ne uspe kreiranje accounta ili da napišem kod koji će kreirati samo roditelja pa reći da account nije kreiran i da treba ručno kreirati account?:
 				catch (Exception e) {
 					parentRepository.deleteById(user.getUserId());
 					logger.info("ParentController - addNewParent - account not created and parent not recorded.");
 					return new ResponseEntity<RESTError>(new RESTError("Account not created and parent not added."),	HttpStatus.INTERNAL_SERVER_ERROR);
 				}
-/*	ili ovako:	
-		catch (Exception e) {
-			return new ResponseEntity<RESTError>(new RESTError("parent added but account not created, create one later"),	HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-*/
-		
-
-				logger.info("ParentController - addNewParent - finished.");
+	logger.info("ParentController - addNewParent - finished.");
 				return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);	
-				}  // od else!!!
+				}
 			}catch (Exception e){
 				logger.info("ParentController - addNewParent - internal server error.");
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);						
@@ -289,7 +212,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				return new ResponseEntity<RESTError>(new RESTError("Parent object is invalid."),HttpStatus.BAD_REQUEST);
 			}
 
-			//da bih dodao roditlje proveravam da li je neki učenik njegovo dete:
 			List<StudentEntity> students = new ArrayList<>();
 			for(Integer studentId : newParent.getStudentsId()) {	
 				StudentEntity student = studentRepository.findById(studentId).orElse(null);
@@ -310,7 +232,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				return new ResponseEntity<RESTError>(new RESTError("Parent object is invalid."),HttpStatus.BAD_REQUEST);
 			}		
 
-//*ako već postoji kao user:
 			UserEntity user = userRepository.findByJmbg(newParent.getJmbg());
 			if(user != null) {
 				ParentEntity parentExists = parentRepository.findById(user.getUserId()).orElse(null);
@@ -355,7 +276,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 			} 					
 			else {
 		
-//*********				
 				ParentEntity parent = new ParentEntity();
 				parent.setFirstName(newParent.getFirstName());
 				parent.setLastName(newParent.getLastName());
@@ -438,7 +358,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 	}
 	
 	
-	// dodavanje deteta:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-student/{studentId}")
 //	@JsonView(Views.Admin.class)
@@ -469,9 +388,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 		}
 	}
 	
-	
-	
-//brisanje (ne dozvoljava account)
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -485,7 +401,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-			// provera da li je roditelj nekom učeniku:
 			Iterable<StudentEntity> students = studentRepository.findAll();
 			for (StudentEntity student : students) {
 				if (student.getParents().contains(parent)) {
@@ -495,8 +410,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-
-			// provera da li je to korisnik nekog naloga:
 			if (accountRepository.findByUserAndRole((UserEntity) parent, EUserRole.ROLE_PARENT) != null) {
 				logger.info("ParentController - deleteParent - parent cannot be deleted.");
 				return new ResponseEntity<RESTError>(new RESTError("The parent have account so you can't delete him."),
@@ -514,10 +427,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 		}
 	}
 
-	
-	
-	
-// brisanje (i parenta i accounta)
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "delete/{id}")
 //	@JsonView(Views.Admin.class)
@@ -531,7 +440,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-			// provera da li je roditelj nekom učeniku:
 			Iterable<StudentEntity> students = studentRepository.findAll();
 			for (StudentEntity student : students) {
 				if (student.getParents().contains(parent)) {
@@ -563,8 +471,6 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				logger.info("ParentController - deleteParentAndAccount - Can't delete account from accountRepository.");
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			//parentRepository.deleteById(id);
-
 			logger.info("ParentController - deleteParentAnd - finished.");
 			return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
 		} catch (Exception e) {
@@ -572,16 +478,8 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
-	}
-			
+	}	
 	
-	
-	
-	
-	
-	
-	
-//front
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.GET, value = "/by-student/{studentId}")
 //	@JsonView(Views.Admin.class)
@@ -622,11 +520,7 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 				return new ResponseEntity<RESTError>(new RESTError("Parent or student with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-/*			if (parent.getStudents().contains(student)) {
-				logger.info("ParentController - removeChildToParent - parent already has that student.");
-				return new ResponseEntity<RESTError>(new RESTError("The student already appears in the list of students."), HttpStatus.BAD_REQUEST);
-			}
-*/
+
 			parent.getStudents().remove(student);
 			parentRepository.save(parent);
 
@@ -639,45 +533,7 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 
 		}
 	}
-	
-	
-	
-	
-	
 
-
-
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-
-	
-// da li je ok:	
-	//deaktivacija, na sve veze postaviti CascadeType=Cascade.All:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 	//@JsonView(Views.Admin.class)
@@ -699,8 +555,5 @@ ovde zatvoriti kosa crta zvezda i obrisati179 i 216 iz linije
 		logger.info("ParentController - deactivateParent - finished.");
 		return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
 	}	
-	
-
-
 
 }

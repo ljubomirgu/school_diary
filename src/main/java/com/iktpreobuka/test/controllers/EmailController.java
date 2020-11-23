@@ -43,30 +43,6 @@ public class EmailController {
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	private static String PATH_TO_ATTACHMENT = "D://BRAINS//SpringWorkspace//school_diary//logs//spring-boot-logging.log";
 
 	@RequestMapping(method = RequestMethod.POST, value = "/emailWithAttachment") 
@@ -80,16 +56,6 @@ public class EmailController {
 	
 	
 		
-/*
-	@RequestMapping(method = RequestMethod.POST, value = "/simpleEmail")
-	public ResponseEntity<?> sendSimpleMessage(@RequestBody EmailObject object) {
-			if (object == null || object.getTo() == null || object.getText() == null) 
-				return null;
-			
-			emailService.sendSimpleMessage(object);
-			return "Your mail has been sent!";
-	}
-*/	
 	@RequestMapping(method = RequestMethod.POST, value = "/templateEmail") 
 	public String sendTemplateMessage(@RequestBody EmailObject object) throws Exception { 
 		if(object==null || object.getTo()==null || object.getText()==null) {

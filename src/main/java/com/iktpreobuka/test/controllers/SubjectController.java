@@ -69,18 +69,6 @@ public class SubjectController {
 		return new ResponseEntity<Iterable<SubjectEntity>>(subjectRepository.findAll(), HttpStatus.OK);
 	}
 	
-/*	
-	@RequestMapping(method = RequestMethod.GET ,value="/review-teachers'")
-	public ResponseEntity<List<SubjectEntity>> reviewTeachersSubjects(@RequestParam Integer teacherId,
-			@RequestParam Boolean fromTheCurrentSchoolAge) {
-		if (teacherId == null || fromTheCurrentSchoolAge == null) {
-			return new ResponseEntity("All fields are mandatory.", HttpStatus.BAD_REQUEST);
-		}
-		//return subjectDao.findTeachersSubjects(teacherId, fromTheCurrentSchoolAge);
-		return new ResponseEntity<List<SubjectEntity>>(subjectDao.findTeachersSubjects(teacherId, fromTheCurrentSchoolAge), HttpStatus.OK);
-	}
-	*/
-
 	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
@@ -188,7 +176,6 @@ public class SubjectController {
 		}
 	}
 
-	// dodavanje razreda:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-year/{yearId}")
 //	@JsonView(Views.Admin.class)
@@ -218,7 +205,6 @@ public class SubjectController {
 		}
 	}
 		
-	// dodavanje nastavnika:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-teacher/{teacherId}")
 //	@JsonView(Views.Admin.class)
@@ -250,8 +236,6 @@ public class SubjectController {
 		}
 	}
 
-//DA LI JE OK I IMA LI SMISLA AKO IMAM KONTROLER LECTURE?????:
-	// dodavanje predaje:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-lecture/{lectureId}")
 //	@JsonView(Views.Admin.class)
@@ -273,7 +257,6 @@ public class SubjectController {
 						HttpStatus.BAD_REQUEST);
 			}
 
-// višak? misli da nije:
 			if (subject.getLectures().contains(lecture)) {
 				logger.info("SubjectController - addLectureToTeacher - subject has that lecture.");
 				return new ResponseEntity<RESTError>(
@@ -297,60 +280,6 @@ public class SubjectController {
 		}
 	}
 
-	
-
-/*
-// dodavanje predaje preko path - svodi sa na pravljene novog Predaje objekta:
-	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-teacher/{teacherId}/add-class/{classId}")
-	@JsonView(Views.Admin.class)
-	public ResponseEntity<?> addLectureToSubjectByThreeIds(@PathVariable Integer id, @PathVariable Integer teacherId,@PathVariable Integer classId) {
-		logger.info("SubjectController - addLectureToTeacher - starts.");
-		try {
-			SubjectEntity subject = subjectRepository.findById(id).orElse(null);
-			TeacherEntity teacher = teacherRepository.findById(teacherId).orElse(null);
-			
-			if (lecture == null || subject == null) {
-				logger.info("SubjectController - addLectureToTeacher - subject and/or lecture not found.");
-				return new ResponseEntity<RESTError>(new RESTError("Subject or lecture with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			}
-			if (subject != lecture.getSubject()) {
-				logger.info("SubjectController - addLectureToTeacher - subject object is invalid.");
-				return new ResponseEntity<RESTError>(new RESTError(
-						"Lecture object is invalid. The subject and subject from the lecture are not same."),
-						HttpStatus.BAD_REQUEST);
-			}
-
-//višak? misli da nije:
-			if (subject.getLectures().contains(lecture)) {
-				logger.info("SubjectController - addLectureToTeacher - subject has that lecture.");
-				return new ResponseEntity<RESTError>(
-						new RESTError("The lecture already appears in the list of lectures."), HttpStatus.BAD_REQUEST);
-			}
-			if (subject.getTeachers().contains(lecture.getTeacher())) {
-				if (subject.getYears().contains(lecture.getSchoolClass().getYear())) {
-					subject.getLectures().add(lecture);
-					subjectRepository.save(subject);
-
-					logger.info("SubjectController - addLectureToTeacher - finished.");
-					return new ResponseEntity<SubjectEntity>(subject, HttpStatus.OK);
-				}
-			}
-			logger.info("SubjectController - addLectureToTeacher - lecture object is invalid.");
-			return new ResponseEntity<RESTError>(new RESTError("Lecture object is invalid."), HttpStatus.BAD_REQUEST);
-		} 
-		catch (Exception e) {
-			logger.info("SubjectController - addLectureToTeacher - internal server error.");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-	*/
-	
-	
-	
-	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -365,7 +294,6 @@ public class SubjectController {
 						HttpStatus.NOT_FOUND);
 			}
 
-			// provera da li neko predavanje referencira taj predmet:
 			Iterable<LectureEntity> lectures = lectureRepository.findAll();
 			for (LectureEntity lecture : lectures) {
 				if (lecture.getSubject().equals(subject)) {
@@ -376,7 +304,6 @@ public class SubjectController {
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-			// provera da li neki razred referencira taj predmet:
 			Iterable<YearEntity> years = yearRepository.findAll();
 			for (YearEntity year : years) {
 				if (year.getSubjects().contains(subject)) {
@@ -388,7 +315,6 @@ public class SubjectController {
 				}
 			}
 
-			// provera da li neko od nastavnika referencira taj predmet:
 			Iterable<TeacherEntity> teachers = teacherRepository.findAll();
 			for (TeacherEntity teacher : teachers) {
 				if (teacher.getSubjects().contains(subject)) {
@@ -399,14 +325,7 @@ public class SubjectController {
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-
-			/*
-			 * pre brisanja predmeta treba ga obrisati iz svih tabela gde se pojavljuje,
-			 * kako to? da li je ok CascadeType.DELETE? 
-			 * subject.getLectures().clear();
-			 * subject.getTeachers().clear();
-			 *  subject.getYears().clear();
-			 */
+			
 			subjectRepository.deleteById(id);
 
 			logger.info("SubjectController - deleteSubject - finished.");
@@ -420,9 +339,6 @@ public class SubjectController {
 	}
 	
 	
-//front:
-	
-	//svi predmeti jednog profesora	
 		@Secured({"ROLE_ADMIN", "ROLE_TEACHER"})
 		@RequestMapping(method = RequestMethod.GET, value = "/teacher/{teacherId}")
 //		@JsonView(Views.Admin.class)
@@ -477,28 +393,7 @@ public class SubjectController {
 			}
 		}
 		
-		
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//za CascadeTyp=All:	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 	@JsonView(Views.Admin.class)

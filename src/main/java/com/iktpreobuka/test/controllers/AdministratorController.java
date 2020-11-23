@@ -56,8 +56,6 @@ public class AdministratorController {
 	private AccountDao accountDao;
 	@Autowired
 	private AccountRepository accountRepository;
-//	@Value("${logging.file.name}")
-//	private String logFilePath;
 	
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 	
@@ -121,7 +119,6 @@ public class AdministratorController {
 				return new ResponseEntity<RESTError>(new RESTError("That usernam already exists."),HttpStatus.BAD_REQUEST);
 			}
 		
-//******* ako već posotji kao druga rola:
 			UserEntity user = userRepository.findByJmbg(newAdmin.getJmbg());
 			if(user != null) {
 				
@@ -162,7 +159,6 @@ public class AdministratorController {
 				return new ResponseEntity<>("Administrator was successfully recorded", HttpStatus.OK);	
 		
 			}	
-//********			
 			
 			AdministratorEntity admin = new AdministratorEntity();
 			admin.setFirstName(newAdmin.getFirstName());
@@ -234,12 +230,7 @@ public class AdministratorController {
 			if (updateAdmin.getJmbg() != null && !updateAdmin.getJmbg().equals(" ") && !updateAdmin.getJmbg().equals("")) {
 				admin.setJmbg(updateAdmin.getJmbg());
 			}
-			
-	/*		
-			if (updateAdmin.getDateOfBirth() != null || !updateAdmin.getPhoneNumber().equals(" ") || !updateAdmin.getPhoneNumber().equals("")) {
-				admin.setDateOfBirth(updateAdmin.getDateOfBirth());
-			}
-		*/
+	
 			if (updateAdmin.getDateOfBirth() != null) {
 				admin.setDateOfBirth(updateAdmin.getDateOfBirth());
 			}
@@ -260,25 +251,7 @@ public class AdministratorController {
 	}
 	
 	
-/*	nije neophodno više jer rola nije atribut u user-u:
- * 
-	@RequestMapping(method = RequestMethod.PUT, value = "change/{id}/role/{role}")
-	public ResponseEntity<?> changeAdminRole(@PathVariable Integer id, @PathVariable String role) {
-		AdministratorEntity admin = administratorRepository.findById(id).get();
-
-		if (admin == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Administrator with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-		}
-		EUserRole userRole = EUserRole.valueOf(role);
-		// provera role pa onda deaktivacija akounta pa kreiranje novog
-		admin.setRole(userRole);
-
-		return new ResponseEntity<AdministratorEntity>(administratorRepository.save(admin), HttpStatus.OK);
-	}
-*/
 	
-//ne dozvoli brisanje administarora ako ima account (a dobio ga je čim je kreiran):
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 	@JsonView(Views.Admin.class)
@@ -292,28 +265,13 @@ public class AdministratorController {
 				return new ResponseEntity<RESTError>(new RESTError("Administrator with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-/*	nekonzistentnost baze
- * 	AccountEntity account = accountRepository.findByUserAndRole((UserEntity)admin, EUserRole.ROLE_ADMIN);
-		accountRepository.delete(account);
-*/	
 		
-//			if(admin.getAccount() != null)
-//je li višak zbog reda iznad? šta ostaviti, gornji ili donji:			
-				if(accountRepository.findByUserAndRole((UserEntity)admin, EUserRole.ROLE_ADMIN)!=null) {
-					logger.info("AdministratorController - deleteAdministrator - the administartor have account so cannot be deleted.");		
-					return new ResponseEntity<RESTError>(new RESTError("There is  account whose user is this administartor so you can't delete him."),HttpStatus.BAD_REQUEST);
-				}
+			if(accountRepository.findByUserAndRole((UserEntity)admin, EUserRole.ROLE_ADMIN)!=null) {
+				logger.info("AdministratorController - deleteAdministrator - the administartor have account so cannot be deleted.");		
+				return new ResponseEntity<RESTError>(new RESTError("There is  account whose user is this administartor so you can't delete him."),HttpStatus.BAD_REQUEST);
+			}
 			administratorRepository.deleteById(id);
-/*
- * 
-NE FERCERA - NULL P. EXCEPTION, OBRIŠE ADMINA ALI OSTANE ACCOUNT:	
-		AccountEntity account = accountRepository.findByUserAndRole((UserEntity)admin, EUserRole.ROLE_ADMIN);
-//		UserEntity user = (UserEntity)teacher;
-//		user.getAccounts().remove(account);
-//		userRepository.save(user);
-		administratorRepository.delete(admin);
-		accountRepository.delete(account);
-*/		
+		
 			logger.info("AdministratorController - deleteAdministrator - finished.");		
 			return new ResponseEntity<AdministratorEntity>(admin, HttpStatus.OK);
 		}
@@ -326,7 +284,6 @@ NE FERCERA - NULL P. EXCEPTION, OBRIŠE ADMINA ALI OSTANE ACCOUNT:
 	
 	
 	
-//delete admina briše i njegov nalog:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/delete/{id}")
 	@JsonView(Views.Admin.class)
@@ -371,33 +328,10 @@ NE FERCERA - NULL P. EXCEPTION, OBRIŠE ADMINA ALI OSTANE ACCOUNT:
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-/*
+	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method=RequestMethod.GET,value="/downloadLogFile")
 	public void getLogFile2(HttpSession session,HttpServletResponse response) throws Exception {
-		String text=null;
-	    try {
-	        String filePathToBeServed = "D:\\BRAINS\\SpringWorkspace\\school_diary\\logs\\spring-boot-logging.log";
-	        File fileToDownload = new File(filePathToBeServed);
-	        InputStream inputStream = new FileInputStream(fileToDownload);
-	        response.setContentType("application/force-download");
-	        response.setHeader("Content-Disposition", "attachment; filename=spring-boot-logging.log"); 
-	        IOUtils.copy(inputStream, response.getOutputStream());
-	        response.flushBuffer();
-	        text= response.getHeader("Content-Disposition");//
-	        inputStream.close();
-	        
-	    } catch (Exception e){
-	        logger.info("Request could not be completed at this moment. Please try again.");
-	        e.printStackTrace();
-	       }   
-
-	}
-*/
-	@Secured("ROLE_ADMIN")
-	@RequestMapping(method=RequestMethod.GET,value="/downloadLogFile")
-	public void getLogFile2(HttpSession session,HttpServletResponse response) throws Exception {
-		String text=null;
 	    try {
 	        String filePathToBeServed = "D:\\BRAINS\\SpringWorkspace\\school_diary\\logs\\spring-boot-logging.log";
 	        File fileToDownload = new File(filePathToBeServed);
@@ -416,77 +350,7 @@ NE FERCERA - NULL P. EXCEPTION, OBRIŠE ADMINA ALI OSTANE ACCOUNT:
 
 	}
 	
-	
-	
-	
-/*	@RequestMapping(method = RequestMethod.GET, value = "/download")
-	public ResponseEntity<?> downloadLogFile() {
-		try {	
-			
-			Path path = Paths.get(logFilePath);
-			File myFile = new File(logFilePath);
-			File copyDestination = new File("C:\\Users\\" + System.getProperty("user.name") + "\\Downloads\\" + path.getFileName());
-			FileUtil.copyFile(myFile, copyDestination);			
-			
-			return new ResponseEntity<String>("Log file je uspesno skinut!", HttpStatus.OK);
- 		} catch (Exception e) {
- 			return new ResponseEntity<>( HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-	}
-*/	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-// da li je ok:	
-	//deaktivacija:
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 	//@JsonView(Views.Admin.class)
@@ -501,7 +365,6 @@ NE FERCERA - NULL P. EXCEPTION, OBRIŠE ADMINA ALI OSTANE ACCOUNT:
 		}
 		UserEntity user = (UserEntity) admin;
 		
-// da li ovde treba t-c pa ako ne nađe da ili obriše i admina ili...???:
 		AccountEntity account = accountRepository.findByUserAndRole(user, EUserRole.ROLE_ADMIN);
 		account.setIsActive(false);
 		accountRepository.save(account);

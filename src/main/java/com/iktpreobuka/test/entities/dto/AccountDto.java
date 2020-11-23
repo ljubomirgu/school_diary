@@ -14,7 +14,7 @@ import com.iktpreobuka.test.enumerations.EUserRole;
 
 public class AccountDto {
 
-//    @NotNull(message = "Username  must be provided.")
+//  @NotNull(message = "Username  must be provided.")
 	private String username;
     
 //	@NotNull(message = "Password  must be provided.")
@@ -24,7 +24,6 @@ public class AccountDto {
 //	@NotNull(message = "Role  must be provided.")
 	private String role;
 	
-// ako hoću da kreiram samo account moram zakomentarisati notnull:
 //	@NotNull(message = "User id  must be provided.")
 	private Integer userId;
 	

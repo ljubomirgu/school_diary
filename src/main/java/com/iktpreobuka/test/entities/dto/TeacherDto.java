@@ -21,12 +21,7 @@ public class TeacherDto {
 //	@NotNull(message = "JMBG   must be provided.")
 	@Size(min=13, max=13, message = "JMBG must be {min}  characters long.")
 	private String jmbg;
-	
-/*	
-	@NotNull(message = "Role must be provided.")
-	private EUserRole role;
-*/	
-	
+		
 //	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 //	@NotNull(message = "Date of birth must be provided.")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -46,7 +41,6 @@ public class TeacherDto {
 	private List<Integer> subjectsId;
 //	private List<String> subjects;
 	
-//može i neko ograničenje za dužinu i sdržaj karaktera za username i pass:
 //	@NotNull(message = "Username  must be provided.")
 	private String username;
 

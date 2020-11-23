@@ -5,10 +5,10 @@ import com.iktpreobuka.test.security.Views;
 
 public class RESTError {
 	
-	@JsonView(Views.Admin.class) // ???
+	@JsonView(Views.Admin.class)
 	private Integer code;
 	
-	@JsonView(Views.Admin.class) // ???
+	@JsonView(Views.Admin.class)
 	private String message;
 
 	public RESTError() {

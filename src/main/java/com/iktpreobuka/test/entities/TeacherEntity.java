@@ -48,7 +48,6 @@ public class TeacherEntity extends UserEntity {
 	@OneToMany(mappedBy = "teacher", fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
 	private List<LectureEntity> lectures = new ArrayList<>();
 
-// može li 	@NotNull na listu?:
 //	@JsonIgnore
 //	@JsonView(Views.Teacher.class)
 	@NotNull(message = "Vocation  must be provided.")
@@ -59,25 +58,12 @@ public class TeacherEntity extends UserEntity {
 	nullable = false, updatable = false) })
 	private List<SubjectEntity> subjects = new ArrayList<>();
 	
-/*odeljenje kome je ovaj nastavnik razredni:
-	@OneToOne(mappedBy = "classHead", cascade = CascadeType.REFRESH,fetch = FetchType.LAZY)
-	private ClassEntity hisClass;
-*/
 
 	public TeacherEntity() {
 		super();
 	}
 
 
-/*
-	public TeacherEntity(Date dateOfEmployment, String vocation, List<LectureEntity> lectures, ClassEntity hisClass) {
-		super();
-		this.dateOfEmployment = dateOfEmployment;
-		this.vocation = vocation;
-		this.lectures = lectures;
-		this.hisClass = hisClass;
-	}
-*/	
 	public TeacherEntity(Date dateOfEmployment, String vocation, List<LectureEntity> lectures, List<SubjectEntity> subjects) {
 		super();
 		this.dateOfEmployment = dateOfEmployment;
@@ -121,15 +107,4 @@ public class TeacherEntity extends UserEntity {
 		this.subjects = subjects;
 	}
 
-	
-/*
-	public ClassEntity getHisClass() {
-		return hisClass;
-	}
-
-
-	public void setHisClass(ClassEntity hisClass) {
-		this.hisClass = hisClass;
-	}
-*/
 }

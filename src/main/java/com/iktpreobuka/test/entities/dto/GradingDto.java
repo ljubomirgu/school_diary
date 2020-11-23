@@ -32,14 +32,6 @@ public class GradingDto {
 		super();
 	}
 
-//	@NotNull(message = "Grade type must be provided.")
-//	private EGradeType gradeType;
-	
-//	@NotNull(message = "Date of grade  must be provided.")
-//	private Date dateOfGrade;
-	
-//	private Integer classId;	
-
 	public GradingDto(String semester, Integer grade, Integer subjectId,
 				Integer studentId,Integer teacherId) {
 		super();

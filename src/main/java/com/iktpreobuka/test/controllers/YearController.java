@@ -104,7 +104,6 @@ public class YearController {
 		}
 		try {
 			YearEntity year = new YearEntity();
-//dodato:
 			Iterable<YearEntity> years = yearRepository.findAll();
 			for(YearEntity yearY : years) {
 				if(yearY.getYear().equals(EYear.valueOf(newYear.getYear())))
@@ -169,7 +168,6 @@ public class YearController {
 		}
 	}
 
-// dodavanje predmeta:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-subject/{subjectId}")
 //	@JsonView(Views.Admin.class)
@@ -202,7 +200,6 @@ public class YearController {
 		}
 	}
 
-// dodavanje odeljenja:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-class/{classtId}")
 //	@JsonView(Views.Admin.class)
@@ -248,7 +245,6 @@ public class YearController {
 						HttpStatus.NOT_FOUND);
 			}
 
-			// provera da li neki predmet referencira taj razred:
 			Iterable<SubjectEntity> subjects = subjectRepository.findAll();
 			for (SubjectEntity subject : subjects) {
 				if (subject.getYears().contains(year)) {
@@ -258,8 +254,7 @@ public class YearController {
 							HttpStatus.BAD_REQUEST);
 				}
 			}
-
-			// provera da li neko odeljenje referencira taj razred:
+			
 			Iterable<ClassEntity> classes = classRepository.findAll();
 			for (ClassEntity schoolClass : classes) {
 				if (schoolClass.getYear().equals(year)) {
@@ -281,10 +276,7 @@ public class YearController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-	
-	//front:
-	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/remove-subject/{subjectId}")
 //	@JsonView(Views.Admin.class)
@@ -299,12 +291,7 @@ public class YearController {
 				return new ResponseEntity<RESTError>(new RESTError("Year or subject with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-/*			if (year.getSubjects().contains(subject)) {
-				logger.info("YearController - removeSubjectToYear - that subject already appears in years list of subjects.");
-				return new ResponseEntity<RESTError>(new RESTError("Year already have that subject."),
-						HttpStatus.BAD_REQUEST);
-				}
-*/
+
 			year.getSubjects().remove(subject);
 			yearRepository.save(year);
 
@@ -317,39 +304,7 @@ public class YearController {
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-//CascadeType.All	
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 	@JsonView(Views.Admin.class)

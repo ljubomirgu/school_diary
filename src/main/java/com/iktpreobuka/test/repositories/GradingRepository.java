@@ -20,13 +20,7 @@ public interface GradingRepository extends CrudRepository<GradingEntity, Integer
 
 	@Query("select g from GradingEntity g  join g.student s  join s.parents p where p = :parent")
  	public List<GradingEntity> findByParent(@Param ("parent") ParentEntity parent);
-	
-/*
-	@Query("select g from GradingEntity g  where g.student = :student and g.gradingId = :gradeId")
-	public GradingEntity findByStudentAndId(StudentEntity student, Integer gradeId);
-*/
-	
-	
+		
 	public GradingEntity findByStudentAndGradingId(StudentEntity student, Integer gradeId);
 
 

@@ -14,9 +14,8 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.iktpreobuka.test.security.Views;
 
 @Entity
-@Table(name = "administrator")//, uniqueConstraints = {@UniqueConstraint(columnNames = "jmbg")})
+@Table(name = "administrator")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-//@DiscriminatorValue("4")
 @PrimaryKeyJoinColumn(name = "adminId")
 public class AdministratorEntity extends UserEntity {
 	

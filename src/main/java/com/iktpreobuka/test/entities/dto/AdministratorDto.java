@@ -28,7 +28,6 @@ public class AdministratorDto{
 //	@NotNull(message = "Phone number must be provided")
 	private String phoneNumber;
 	
-//može i neko ograničenje za dužinu i sadržaj karaktera za username i pass:
 //	@NotNull(message = "Username  must be provided.")
 	private String username;
 
@@ -38,19 +37,6 @@ public class AdministratorDto{
 	public AdministratorDto() {
 		super();
 	}
-/*
-	public AdministratorDto(String firstName, String lastName, String jmbg, EUserRole role, Date dateOfBirth,
-			String phoneNumber) {
-		super();
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.jmbg = jmbg;
-		this.role = role;
-		this.dateOfBirth = dateOfBirth;
-		this.phoneNumber = phoneNumber;
-	}
-	
-	*/
 
 	public AdministratorDto( String firstName, String lastName, String jmbg,
 			Date dateOfBirth, String phoneNumber, String username, String password) {

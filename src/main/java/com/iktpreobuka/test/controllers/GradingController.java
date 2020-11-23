@@ -106,95 +106,7 @@ public class GradingController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-/*	
-//sve ocene jednog učenika:	
-//DA LI TREBA DA ODVOJIM OVU METODU POSEBNO ZA STUDENTA A POSEBNO ZA ADMINA ILI ZA ADMINA NI NE TREBA?:
-//ucenik vidi samo svoje ocene:
-	@Secured("ROLE_STUDENT")
-	@RequestMapping(method = RequestMethod.GET, value = "/student/{id}/by-student")
-	@JsonView(Views.Student.class)
-	public ResponseEntity<?> getGradingsByStudent(@PathVariable Integer id, Principal principal) {
-		logger.info("GradingController - getGradingsByStudent - starts.");
-		try {
-			StudentEntity student = studentRepository.findById(id).orElse(null);
-			if (student == null) {
-				logger.info("GradingController - getGradingsByStudent - student not found.");
-				return new ResponseEntity<RESTError>(new RESTError("Student with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			}
-			
-//višak jer stoji @secured:
-			AccountEntity account = accountRepository.findByUsername(principal.getName());
-			if (!account.getRole().equals(EUserRole.ROLE_STUDENT)) {
-				logger.info("GradingController - getGradingsByStudent - you don't have permission for this action.");
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."), HttpStatus.FORBIDDEN);
-			}
 
-			if (account.getUser().getUserId() != id) {
-				logger.info("GradingController - getGradingsByStudent - you don't have permission for this action.");
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."), HttpStatus.FORBIDDEN);
-			}
-
-			logger.info("GradingController - getGradingsByStudent - finished.");
-			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByStudent(student), HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-	
-//AKO TReBA GORNJA ODVOJENO ZA ADMINA: ***************************************
-		@Secured("ROLE_ADMIN")
-		@RequestMapping(method = RequestMethod.GET , value="/student/{id}/by-admin")
-		@JsonView(Views.Student.class)
-		public ResponseEntity<?> getGradingsForStudentByAdmin(@PathVariable Integer id, Principal principal) {
-			logger.info("GradingController - getGradingsForStudentByAdmin - starts.");
-			
-			StudentEntity student = studentRepository.findById(id).orElse(null);
-			if(student == null)
-				return new ResponseEntity<RESTError>(new RESTError("Administrator with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-						
-			logger.info("GradingController - getGradingsForStudentByAdmin - finished.");
-			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByStudent(student), HttpStatus.OK);
-		}
-
-//jedna ocena jednog učenika:
-		@Secured("ROLE_STUDENT")
-		@RequestMapping(method = RequestMethod.GET , value="/student/{id}/by-student/{gradeId}")
-		@JsonView(Views.Student.class)
-		public ResponseEntity<?> getGradingByIdForStudent(@PathVariable Integer id, Principal principal,@PathVariable Integer gradeId) {
-			logger.info("GradingController - getGradingsByStudent - starts.");
-			
-			StudentEntity student = studentRepository.findById(id).orElse(null);
-			if(student == null)
-				return new ResponseEntity<RESTError>(new RESTError("Student with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			GradingEntity grading = gradingRepository.findById(gradeId).orElse(null);
-			if(grading == null)
-				return new ResponseEntity<RESTError>(new RESTError("Grading with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			AccountEntity account = accountRepository.findByUsername(principal.getName());
-	
-				
-			if(account.getUser().getUserId() != id)
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-						HttpStatus.FORBIDDEN);
-			
-			if(!(grading.getStudent().equals(student)))
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-						HttpStatus.FORBIDDEN);
-			
-			logger.info("GradingController - getGradingsByStudent - finished.");
-	//		return new ResponseEntity<GradingEntity>(gradingRepository.findByStudentAndGradingId(student, gradeId), HttpStatus.OK);
-			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
-
-		}
-		
-*/		
-
-//sve ocene ulogovanog studenta	(bez {id} u uri-u):
 		@Secured("ROLE_STUDENT")
 		@RequestMapping(method = RequestMethod.GET, value = "/student")
 //		@JsonView(Views.Student.class)
@@ -219,7 +131,6 @@ public class GradingController {
 			}
 		}
 		
-//jedna ocena za ulogovanog studenta 		
 		@Secured("ROLE_STUDENT")
 		@RequestMapping(method = RequestMethod.GET, value = "/student/{gradeId}")
 //		@JsonView(Views.Student.class)
@@ -257,95 +168,7 @@ public class GradingController {
 			}
 		}
 			
-		
-		
-		
-/*		
-		
-		
-		
-//sve ocene roditeljeve dece:
-	@Secured({"ROLE_ADMIN","ROLE_PARENT"})
-	@RequestMapping(method = RequestMethod.GET , value="/parent/{id}/by-parent")
-	@JsonView(Views.Parent.class)
-	public ResponseEntity<?> getGradingsByParent(@PathVariable Integer id, Principal principal) {
-		logger.info("GradingController - getGradingsByParent - starts.");
-		
-		ParentEntity parent = parentRepository.findById(id).orElse(null);
-		if(parent == null)
-			return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-		
-		AccountEntity account = accountRepository.findByUsername(principal.getName());
-		if(!account.getRole().equals(EUserRole.ROLE_PARENT))
-			return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-					HttpStatus.FORBIDDEN);
-		
-		if(account.getUser().getUserId() != id)
-			return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-						HttpStatus.FORBIDDEN);
-		
-		logger.info("GradingController - getGradingsByParent - finished.");
-//		return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
-		return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByParent(parent), HttpStatus.OK);
 
-	}
-	
-//AKO TREBA GORNJA METODA POSEBNO ZA ADMINA:*************************************************AKO TREBA, ONDA GORE OBRISATI U @SECURED "ROLE_ADMIN" i proveriti sve putanje!!!!
-		@Secured("ROLE_ADMIN")
-		@RequestMapping(method = RequestMethod.GET , value="/parent/{id}/by-admin")
-		@JsonView(Views.Parent.class)
-		public ResponseEntity<?> getGradingsForParentByAdmin(@PathVariable Integer id, Principal principal) {
-			logger.info("GradingController - getGradingsForParentByAdmin - starts.");
-			
-			ParentEntity parent = parentRepository.findById(id).orElse(null);
-			if(parent == null)
-				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			logger.info("GradingController - getGradingsForParentByAdmin - finished.");
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
-			return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByParent(parent), HttpStatus.OK);
-
-		}
-
-//jedna ocena roditeljevog deteta:
-		@Secured("ROLE_PARENT")
-		@RequestMapping(method = RequestMethod.GET , value="/parent/{id}/by-parent/{gradeId}")
-		@JsonView(Views.Parent.class)
-		public ResponseEntity<?> getGradingByIdForParent(@PathVariable Integer id, Principal principal,@PathVariable Integer gradeId) {
-			logger.info("GradingController - getGradingsByParent - starts.");
-			
-			ParentEntity parent = parentRepository.findById(id).orElse(null);
-			if(parent == null)
-				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			GradingEntity grading = gradingRepository.findById(gradeId).orElse(null);
-			if(grading == null)
-				return new ResponseEntity<RESTError>(new RESTError("Grading with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			AccountEntity account = accountRepository.findByUsername(principal.getName());
-				
-			if(account.getUser().getUserId() != id)
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-							HttpStatus.FORBIDDEN);
-			
-			if(!(grading.getStudent().getParents().contains(parent)))
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-						HttpStatus.FORBIDDEN);
-			
-			
-			logger.info("GradingController - getGradingsByParent - finished.");
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
-			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
-
-		}
-		
-*/	
-
-//sve ocene dece ulogovanog roditelja :
 	@Secured("ROLE_PARENT")
 	@RequestMapping(method = RequestMethod.GET, value = "/parent")
 //	@JsonView(Views.Parent.class)
@@ -366,7 +189,6 @@ public class GradingController {
 
 			logger.info("GradingController - getGradingsForParent - finished.");
 			 return new	 ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByParent(parent), HttpStatus.OK);
 		} 
 		catch (Exception e) {
 			logger.info("GradingController - getGradingsForParent - internal server error.");
@@ -374,7 +196,6 @@ public class GradingController {
 		}
 	}
 
-//jedna ocena za ulogovanog roditelja:
 	@Secured("ROLE_PARENT")
 	@RequestMapping(method = RequestMethod.GET, value = "/parent/{gradeId}")
 //	@JsonView(Views.Parent.class)
@@ -406,7 +227,6 @@ public class GradingController {
 			}
 
 			logger.info("GradingController - getGradingByIdForParent - finished.");
-			// return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
 			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
 		} 
 		catch (Exception e) {
@@ -416,7 +236,6 @@ public class GradingController {
 
 	}
 
-//sve ocene za jednog nastavnika:	
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.GET, value = "/teacher1")
 //	@JsonView(Views.Teacher.class)
@@ -436,29 +255,10 @@ public class GradingController {
 			}
 
 			logger.info("GradingController - getGradingsForTeacher - finished.");
-/*
-			Iterable<GradingEntity> gradings = new Iterable<GradingEntity>() {
-				
-				@Override
-				public Iterator<GradingEntity> iterator() {
-					// TODO Auto-generated method stub
-					return null;
-				}
-			};
-			
-			try {
-					gradings = gradingRepository.findByTeacher(teacher);
-			} catch (Exception e) {
-				logger.info("GradingController - getGradingsForTeacher - query is inccorect.");
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-*/		
+	
 			 return new	 ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByTeacher(teacher), HttpStatus.OK);
 		
-			
-//			 return new	 ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByTeacher(teacher), HttpStatus.OK);
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByTeacher(teacher), HttpStatus.OK);
-		} 
+			} 
 		catch (Exception e) {
 			logger.info("GradingController - getGradingsForTeacher - internal server error.");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -466,7 +266,6 @@ public class GradingController {
 	}
 
 
-	//sve ocene za jednog nastavnika:	
 		@Secured("ROLE_TEACHER")
 		@RequestMapping(method = RequestMethod.GET, value = "/teacher")
 //		@JsonView(Views.Teacher.class)
@@ -497,7 +296,6 @@ public class GradingController {
 		}
 
 	
-//jedna ocena za nastavnika
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.GET, value = "/teacher/{gradeId}")
 //	@JsonView(Views.Teacher.class)
@@ -528,7 +326,6 @@ public class GradingController {
 				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."), HttpStatus.FORBIDDEN);
 			}
 			logger.info("GradingController - getGradingByIdForTeacher - finished.");
-			// return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByParent(parent), HttpStatus.OK);
 			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
 		} 
 		catch (Exception e) {
@@ -537,186 +334,12 @@ public class GradingController {
 		}
 	}
 	
-/*	
-	
-//AKO SVE OVE GET METODE TREBAJU ODVOJENO ZA ADMINA I TOG NEKOG, PROVERITI USLOV OKO ACCOUNTA I ROLE!************		
-//query!?!?!
-		@Secured({"ROLE_ADMIN","ROLE_TEACHER"})
-		@RequestMapping(method = RequestMethod.GET , value="/teacher/{id}/by-teacher")
-		@JsonView(Views.Teacher.class)
-		public ResponseEntity<?> getGradingsByTeacher(@PathVariable Integer id, Principal principal) {
-			logger.info("GradingController - getGradingsByTeacher - starts.");
-			
-			TeacherEntity teacher = teacherRepository.findById(id).orElse(null);
-			if(teacher == null)
-				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			
-			AccountEntity account = accountRepository.findByUsername(principal.getName());
-			if(account.getRole().equals(EUserRole.ROLE_TEACHER))
-				if(account.getUser().getUserId() != id)
-					return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-							HttpStatus.FORBIDDEN);
-			
-			logger.info("GradingController - getGradingsByTeacher - finished.");
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByTeacher(teacher), HttpStatus.OK);
-			return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByTeacher(teacher), HttpStatus.OK);
-//ovo return null obrisati kad napravim metodu iznad:
-//		return null;
-		}
-	
-//AKO TREBA GORNJA METODA POSEBNO ZA ADMINA:*************************************************AKO TREBA, ONDA GORE OBRISATI U @SECURED "ROLE_ADMIN"!!!!???
-//query!?!?!
-		@Secured("ROLE_ADMIN")
-		@RequestMapping(method = RequestMethod.GET , value="/teacher/{id}/by-admin")
-		@JsonView(Views.Teacher.class)
-		public ResponseEntity<?> getGradingsForTeacherByAdmin(@PathVariable Integer id, Principal principal) {
-			logger.info("GradingController - getGradingsByTeacher - starts.");
-				
-			TeacherEntity teacher = teacherRepository.findById(id).orElse(null);
-			if(teacher == null)
-				return new ResponseEntity<RESTError>(new RESTError("Parent with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-				
-			logger.info("GradingController - getGradingsByTeacher - finished.");
-//			return new ResponseEntity<Iterable<GradingEntity>>(gradingRepository.findByTeacher(teacher), HttpStatus.OK);
-			return new ResponseEntity<Iterable<GradingEntity>>(gradingDao.findByTeacher(teacher), HttpStatus.OK);
-//ovo return null obrisati kad napravim metodu iznad:
-//				return null;
-		}	
-		
-		
-// jedna ocena roditeljevog deteta:
-	@Secured("ROLE_TEACHER")
-	@RequestMapping(method = RequestMethod.GET, value = "/teacher/{id}/by-teacher/{gradeId}")
-	@JsonView(Views.Parent.class)
-	public ResponseEntity<?> getGradingByIdForTeacher(@PathVariable Integer id, Principal principal,
-			@PathVariable Integer gradeId) {
-		logger.info("GradingController - getGradingsByParent - starts.");
-
-		TeacherEntity teacher = teacherRepository.findById(id).orElse(null);
-		if (teacher == null)
-			return new ResponseEntity<RESTError>(new RESTError("Teacher with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-
-		GradingEntity grading = gradingRepository.findById(gradeId).orElse(null);
-		if (grading == null)
-			return new ResponseEntity<RESTError>(new RESTError("Grading with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-
-		AccountEntity account = accountRepository.findByUsername(principal.getName());
-
-		if (account.getUser().getUserId() != id)
-			return new ResponseEntity<RESTError>(new RESTError("You don't have permission."), HttpStatus.FORBIDDEN);
-
-		if (!(grading.getLecture().getTeacher().equals(teacher)))
-			return new ResponseEntity<RESTError>(new RESTError("You don't have permission."), HttpStatus.FORBIDDEN);
-
-		logger.info("GradingController - getGradingsByParent - finished.");
-
-		return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
-
-	}
-		
-		
-*/		
-		
-/*			
-
-	@SuppressWarnings("unused")
-	@Secured("ROLE_TEACHER")
-	@RequestMapping(method = RequestMethod.POST)
-	@JsonView(Views.Teacher.class)
-	public ResponseEntity<?> addNewGrading(@Valid @RequestBody GradingDto newGrading, BindingResult result, Principal principal) {
-		logger.info("GradingController - addNewGrading - starts.");
-					
-		if(result.hasErrors()) {
-			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-		}
-	
-		if (newGrading == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Grading object is invalid."),
-					HttpStatus.BAD_REQUEST);
-		}
-		if(newGrading.getGrade()==null || newGrading.getSemester()==null || newGrading.getStudentId()==null 
-				|| newGrading.getSubjectId()==null || newGrading.getTeacherId() == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Grading object is invalid."),
-					HttpStatus.BAD_REQUEST);
-		}
-			
-		TeacherEntity teacher = teacherRepository.findById(newGrading.getTeacherId()).orElse(null);
-		if(teacher == null)
-			return new ResponseEntity<RESTError>(new RESTError("Teacher not found."),
-					HttpStatus.NOT_FOUND);
-		
-// provera da li je logovani nastavnik taj koji sme da da ocenu iz tog predmeta tom učeniku:		
-		AccountEntity account = accountRepository.findByUsername(principal.getName());
-		if(account.getRole().equals(EUserRole.ROLE_TEACHER))
-			if(account.getUser().getUserId() != teacher.getUserId())
-				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
-						HttpStatus.FORBIDDEN);
-			
-		StudentEntity student = studentRepository.findById(newGrading.getStudentId()).orElse(null);
-		if(student == null)
-			return new ResponseEntity<RESTError>(new RESTError("Student not found."),
-					HttpStatus.NOT_FOUND);
-		
-		SubjectEntity subject = subjectRepository.findById(newGrading.getSubjectId()).orElse(null);
-		if(subject == null)
-			return new ResponseEntity<RESTError>(new RESTError("Subject not found."),
-					HttpStatus.NOT_FOUND);
-
-		if(!(newGrading.getSemester().equals(ESemester.FIRST_SEMESTER.toString()) || newGrading.getSemester().equals(ESemester.SECOND_SEMESTER.toString())))
-				return new ResponseEntity<RESTError>(new RESTError("Semestar must be FIRST_SEMESTER or SECOND_SEMESTER."),
-						HttpStatus.BAD_REQUEST);
-		
-		if(newGrading.getGrade()<1 || newGrading.getGrade()>5)
-			return new ResponseEntity<RESTError>(new RESTError("Grade must be between 1 and 5."),
-					HttpStatus.BAD_REQUEST);
-
-		LectureEntity lecture = lectureRepository.findBySchoolClassAndSubjectAndTeacher(student.getSchoolClass(), subject, teacher);
-		
-		if(lecture == null)
-			return new ResponseEntity<RESTError>(new RESTError("That professor does not teach that subject to that department."),
-					HttpStatus.BAD_REQUEST);
-			
-		GradingEntity grading = new GradingEntity();
-		grading.setGrade(newGrading.getGrade());
-		grading.setSemester(ESemester.valueOf(newGrading.getSemester()));
-		grading.setLecture(lecture);
-		grading.setStudent(student);
-		
-		gradingRepository.save(grading);
-
-//slanje mail-a roditeljima:
-		String emailSubject = "New grade";		
-		String text ="The student " +student.getFirstName()+" "+student.getLastName()+" received a grade "
-				+grading.getGrade()+" from school subject "	+subject+". The grade was given by a teacher " 
-				+grading.getLecture().getTeacher().getFirstName()+ " "+grading.getLecture().getTeacher().getLastName()+".";
-		List<ParentEntity> parents = student.getParents();
-		for(ParentEntity parent : parents) {		
-			EmailObject object = new EmailObject();
-			object.setSubject(emailSubject);
-			object.setText(text);
-			object.setTo(parent.getEmail());
-			emailService.sendSimpleMessage(object); 
-		}
-		
-		
-		logger.info("GradingController - addNewGrading - finished.");
-		return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
-		
-	}
-*/	
-
 	private String createErrorMessage(BindingResult result) {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage)
 				.collect(Collectors.joining(" "));
 	}
 
 	
-
-//novi post gde se ne prosleđuje id nastavnika
 	@SuppressWarnings("unused")
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.POST)
@@ -742,7 +365,6 @@ public class GradingController {
 		}
 			
 		try {
-		// provera da li je logovani nastavnik taj koji sme da da ocenu iz tog predmeta tom učeniku:		
 			AccountEntity account = accountRepository.findByUsername(principal.getName());
 			
 			TeacherEntity teacher = teacherRepository.findById(account.getUser().getUserId()).orElse(null);
@@ -795,7 +417,6 @@ public class GradingController {
 		
 			gradingRepository.save(grading);
 
-		//slanje mail-a roditeljima:
 			String emailSubject = "New grade";		
 			String text ="The student " +student.getFirstName().toString()+" "+student.getLastName().toString()+" received a grade "
 					+grading.getGrade().toString()+" from school subject "	+subject.getSubjectName().toString()+". The grade was given by a teacher " 
@@ -849,8 +470,6 @@ public class GradingController {
 
 			grading.setGrade(grade);
 			gradingRepository.save(grading);
-
-			// može se poslati mail o promeni...
 
 			logger.info("GradingController - updateValueOfGradeByTeacher - finished.");
 			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
@@ -1044,8 +663,6 @@ public class GradingController {
 	}
 	
 	
-//nedovršeno i besmisleno	
-//IZMENA IMA SMISLA SAMO PRI PROMENI VREDNOSTI OCENE:	
 	@SuppressWarnings("unused")
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.PUT,value = "/{id}/by-teacher")///promenaocene/{value}")
@@ -1065,7 +682,7 @@ public class GradingController {
 		if(account.getUser().getUserId() != grading.getLecture().getTeacher().getUserId())
 				return new ResponseEntity<RESTError>(new RESTError("You don't have permission."),
 						HttpStatus.FORBIDDEN);
-//dodato:
+
 		if(newGrading.getTeacherId()!=null) {
 			return new ResponseEntity<RESTError>(new RESTError("You can't change teacher."),
 					HttpStatus.BAD_REQUEST);
@@ -1103,28 +720,13 @@ public class GradingController {
 			if(ESemester.valueOf(newGrading.getSemester()).equals(ESemester.FIRST_SEMESTER) || ESemester.valueOf(newGrading.getSemester()).equals(ESemester.FIRST_SEMESTER))
 				grading.setSemester(ESemester.valueOf(newGrading.getSemester()));
 		}
-		
-/*		if(newGrading.getGrade()<1 || newGrading.getGrade()>5)
-			return new ResponseEntity<RESTError>(new RESTError("Grade must be between 1 and 5."),
-					HttpStatus.BAD_REQUEST);
-//TREBA LI OVA PROVERA:
-		if(grading.getLecture().equals(newGrading.getLecture()) && grading.getSemester().equals(newGrading.getSemester())
-				&& grading.getStudent().equals(newGrading.getStudent())) {
-			
-			grading.setGrade(newGrading.getGrade());		
-			gradingRepository.save(grading);
-		
-			logger.info("GradingController - updateGradingByTeacher - finished.");
-			return new ResponseEntity<GradingEntity>(grading, HttpStatus.OK);
-		}
-*/		
+	
 		return new ResponseEntity<RESTError>(new RESTError("Grading object is invalid."),
 				HttpStatus.BAD_REQUEST);
 		
 	}
 	
 
-//IZMENA IMA SMISLA SAMO PRI PROMENI VREDNOSTI OCENE:	
 	@SuppressWarnings("unused")
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT,value = "/{id}/by-admin")
@@ -1144,7 +746,6 @@ public class GradingController {
 			return new ResponseEntity<RESTError>(new RESTError("Grade must be between 1 and 5."),
 					HttpStatus.BAD_REQUEST);
 
-// TREBA LI OVA PROVERA:
 		if (grading.getLecture().equals(newGrading.getLecture()) && grading.getSemester().equals(newGrading.getSemester())
 				&& grading.getStudent().equals(newGrading.getStudent())) {
 			grading.setGrade(newGrading.getGrade());
@@ -1159,11 +760,6 @@ public class GradingController {
 			
 	}
 		
-		
-	
-	
-	
-//brisanje od starane admina:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}/admin")
 //	@JsonView(Views.Admin.class)
@@ -1189,7 +785,6 @@ public class GradingController {
 		}
 	}
 
-// brisanje ocene od strane nastavnika:
 	@Secured("ROLE_TEACHER")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}/teacher")
 	@JsonView(Views.Teacher.class)
@@ -1228,8 +823,6 @@ public class GradingController {
 	}
 	
 	
-	
-// front:
 	
 	@Secured({"ROLE_ADMIN", "ROLE_STUDENT"})
 	@RequestMapping(method = RequestMethod.GET, value = "/by-student/{studentId}")

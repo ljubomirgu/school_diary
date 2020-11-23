@@ -24,10 +24,6 @@ public class ParentDto {
 	@Pattern(regexp = "^[0-9]{13}", message = "JMBG must contains only digits between 0 and 9")
 	private String jmbg;
 	
-/*
-	 @NotNull(message = "Role must be provided.") 
-	 private EUserRole role;
- */
 //	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 //	@NotNull(message = "Date of birth must be provided.")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -38,18 +34,10 @@ public class ParentDto {
 	@Email
 	private String email;
 
-/* ako roditelj nema i jmbg deteta koje je učenik, ne dodaj roditelja:
-	@NotNull(message = "Childs JMBG   must be provided.")
-	@Size(min = 13, max = 13, message = "JMBG must be {min}  characters long.")
-	private String studentJmbg;
-*/
-// bolje je možda sa spiskom jmbg dece pa se proverava da li su učenici prilikom POST za parent:
-//	private List<String> studentsJmbg;
 //	@NotNull(message="Parent must have children as students.")
 	@JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
 	private List<Integer> studentsId;
 	
-//može i neko ograničenje za dužinu i sdržaj karaktera za username i pass:
 //	@NotNull(message = "Username  must be provided.")
 	private String username;
 

@@ -57,15 +57,14 @@ public class LectureEntity {
 	private ClassEntity schoolClass;
 	
 //	@JsonBackReference(value="lecture-grading")
-//	@JsonView(Views.Student.class) //????????????????????
+//	@JsonView(Views.Student.class)
 	@JsonIgnore
 	@OneToMany(mappedBy = "lecture", fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
 	private List<GradingEntity> gradings = new ArrayList<>();
 
 	@JsonView(Views.Admin.class)
 	@Version
-	private Integer version;  // da li ovde treba version ??
-
+	private Integer version;
 	public LectureEntity() {
 		super();
 	}

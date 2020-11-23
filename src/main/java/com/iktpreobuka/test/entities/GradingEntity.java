@@ -46,17 +46,6 @@ public class GradingEntity {
 	@NotNull(message = "Semester  must be provided.")
 	private ESemester semester;
 	
-/*	
-    @Enumerated(EnumType.STRING)
-	@Column(name = "grade_type",length=50)
-	@NotNull(message = "Grade type must be provided.")
-	private EGradeType gradeType;
-	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-	@Column(name = "date_of_grade")
-	@NotNull(message = "Date of grade  must be provided.")
-	private Date dateOfGrade;
-*/	
 	
 //	@JsonView(Views.Student.class)
 	@Column(name = "grade")
@@ -107,20 +96,6 @@ public class GradingEntity {
 		this.lecture = lecture;
 	}
 
-/*
-	public GradingEntity(Integer gradingId, ESemester semester, EGradeType gradeType, Integer grade, Date dateOfGrade,
-			StudentEntity student, LectureEntity lecture, Integer version) {
-		super();
-		this.gradingId = gradingId;
-		this.semester = semester;
-		this.gradeType = gradeType;
-		this.grade = grade;
-		this.dateOfGrade = dateOfGrade;
-		this.student = student;
-		this.lecture = lecture;
-		this.version = version;
-	}
-*/
 	public Integer getGradingId() {
 		return gradingId;
 	}
@@ -136,15 +111,7 @@ public class GradingEntity {
 	public void setSemester(ESemester semester) {
 		this.semester = semester;
 	}
-/*
-	public EGradeType getGradeType() {
-		return gradeType;
-	}
-
-	public void setGradeType(EGradeType gradeType) {
-		this.gradeType = gradeType;
-	}
-*/
+	
 	public Integer getGrade() {
 		return grade;
 	}
@@ -152,15 +119,7 @@ public class GradingEntity {
 	public void setGrade(Integer grade) {
 		this.grade = grade;
 	}
-/*
-	public Date getDateOfGrade() {
-		return dateOfGrade;
-	}
 
-	public void setDateOfGrade(Date dateOfGrade) {
-		this.dateOfGrade = dateOfGrade;
-	}
-*/
 	public StudentEntity getStudent() {
 		return student;
 	}

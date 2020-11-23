@@ -24,25 +24,6 @@ public class LoginController {
 
 	@Autowired
 	private AccountRepository accountRepository;
-/*
-	@RequestMapping(method = RequestMethod.POST)
-	public ResponseEntity<?> getUser(@RequestBody AccountDto account) {
-		try {
-			AccountEntity user = accountRepository.findByUsername(account.getUsername());
-			if (user == null) {
-				return new ResponseEntity<RESTError>(new RESTError("Account not found!"), HttpStatus.NOT_FOUND);
-			}
-			if (user.getPassword().equals(account.getPassword())) {
-				return new ResponseEntity<RESTError>(new RESTError("You logged in."), HttpStatus.OK);
-			}
-			// return new ResponseEntity<RESTError>(new RESTError("nešto"), HttpStatus.OK);
-
-			return new ResponseEntity<AccountEntity>(user, HttpStatus.OK);
-		} catch (Exception e) {
-			throw e;
-		}
-	}
-*/	
 
 	@RequestMapping(method = RequestMethod.POST)
 	public ResponseEntity<?> getUser(@RequestBody AccountDto account,Principal principal) {
@@ -55,35 +36,11 @@ public class LoginController {
 			if (Encryption.isEqualToEncodedPass(account.getPassword(), user.getPassword())) {
 				return new ResponseEntity<AccountEntity>(user, HttpStatus.OK);
 			}
-			// return new ResponseEntity<RESTError>(new RESTError("nešto"), HttpStatus.OK);
-
 			return new ResponseEntity<RESTError>(new RESTError("usrename or password is not valid"), HttpStatus.OK);
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-/*
-
-	@Autowired
-	AccountDao accountDao;
-
-	@RequestMapping(method = RequestMethod.GET)
-	public ResponseEntity<?> loginHandler() {
-		try {
-			AccountEntity ac = accountRepository.findByUsername(accountDao.getLoggedInUsername());
-			if(ac == null)
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	
-			return new ResponseEntity<AccountEntity>(ac, HttpStatus.OK);
-
-		} catch (Exception e) {
-
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-		}
-
-	}
-*/
 
 }

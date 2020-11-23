@@ -33,10 +33,5 @@ public interface ClassRepository extends CrudRepository<ClassEntity, Integer>{
 	@Query(value="select * from class c left join year y on  c.year=y.year_id left join year_subject ys on y.year_id=ys.year_id"
 	+ " left join subject s on ys.subject_id=s.subject_id left join teacher_subject ts on s.subject_id=ts.subject_id left join teacher t on ts.teacher_id=t.teacher_id  where s.subject_id =:subjectId and t.teacher_id=:teacherId", nativeQuery=true)
 	public ArrayList<ClassEntity> findAllBySubjectIdAndTeacherId(@Param ("subjectId") Integer subjectId, @Param ("teacherId") Integer userId);
-	
-
-	
-// kada nisam imao classId u studentDto:
-//	ClassEntity findByNumberOfDepartmentAndYear(String numberOfDepartment, EYear year);
 
 }

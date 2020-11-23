@@ -30,20 +30,12 @@ public class StudentDto{
 	@Pattern(regexp = "^[0-9]{13}", message = "JMBG must contains only digits between 0 and 9")
 	private String jmbg;
 	
-/*	
-	@NotNull(message = "Role must be provided.")
-	private EUserRole role;
-*/	
-	
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 //	@NotNull(message = "Date of birth must be provided.")
 	@Past(message = "The date of birth must be a date from the past")
 	private Date dateOfBirth;
 	
 	
-
-//	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
 //	@NotNull(message = "Date of entry must be provided.")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Past(message = "Date of entry must be a date from the past")
@@ -51,19 +43,10 @@ public class StudentDto{
 
 	private String note;
 	
-/*zamenjeno sa Integer classId:
-//mnogo lakše ako koristim Integer classId!!
-// da li trebaju notnull (mogu da dodam učenika pa naknadno da ga rasporedim u odeljenje?:
-	@NotNull(message = "Number of department must be provided.")
-	private String numberOfDepartment;	
-	@NotNull(message = "Year must be provided.")
-	private String year;
-*/
 	
 //	@NotNull(message = "Class id must be provided.")
 	private Integer classId;
 	
-//može i neko ograničenje za dužinu i sadržaj karaktera za username i pass:
 	@Pattern(regexp = "^[a-zA-Z0-9_]{3,20}", message = "Username can contains only digits,letters"
 			+ " and underscore.Username must be between 3 and 20 caracters long")
 //	@NotNull(message = "Username  must be provided.")
@@ -87,8 +70,6 @@ public class StudentDto{
 		this.note = note;
 		this.username = username;
 		this.password = password;
-//		this.numberOfDepartment = numberOfDepartment;
-//		this.year = year;
 		this.classId=classId;
 	}
 
@@ -155,23 +136,6 @@ public class StudentDto{
 	public void setPassword(String password) {
 		this.password = password;
 	}
-/*
-	public String getNumberOfDepartment() {
-		return numberOfDepartment;
-	}
-
-	public void setNumberOfDepartment(String numberOfDepartment) {
-		this.numberOfDepartment = numberOfDepartment;
-	}
-
-	public String getYear() {
-		return year;
-	}
-
-	public void setYear(String year) {
-		this.year = year;
-	}
-*/
 
 	public Integer getClassId() {
 		return classId;

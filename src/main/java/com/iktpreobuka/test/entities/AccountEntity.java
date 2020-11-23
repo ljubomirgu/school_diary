@@ -46,13 +46,6 @@ public class AccountEntity {
 	private String password;
 	
 
-/* više rola nije entitet:
- * 
-	@NotNull(message = "Role  must be provided.")
-	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
-	@JoinColumn(name = "role")
-	private RoleEntity role;
-*/
 //	@JsonView(Views.Admin.class)
 	@Enumerated(EnumType.STRING)
 	@NotNull(message = "Role  must be provided.")
@@ -63,8 +56,6 @@ public class AccountEntity {
 //	@JsonManagedReference(value="account-user")
 //	@JsonView(Views.Admin.class)
 //	@JsonIgnore //da ne bi ulazio u rekurziju kod getAllUsers!!!
-// ako hoću da kreiram samo account moram zakomentarisati notnull:-onda izbacuje nullPException, trebao bi celu vezu da 
-// zakomentarišem sa oba kraja ali to menja tabelu 
 	@NotNull(message = "User  must be provided.")
 	@ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user")

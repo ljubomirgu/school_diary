@@ -72,7 +72,6 @@ public class StudentController {
 		return new ResponseEntity<Iterable<StudentEntity>>(studentRepository.findAll(), HttpStatus.OK);
 	}
 	
- //dodato i druga rola zbog profila studenta na front:
 	@Secured({"ROLE_ADMIN" ,"ROLE_STUDENT"})
 	@RequestMapping(method = RequestMethod.GET, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -94,70 +93,6 @@ public class StudentController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-/*stara verzija gde u classDto imam numberOfDepartment i year, a sad su zamenjeni sa classid:
-	@Secured("ROLE_AMIN")
-	@RequestMapping(method = RequestMethod.POST)
-//	@JsonView(Views.Admin.class)
-	public ResponseEntity<?> addNewTeacher(@Valid @RequestBody StudentDto newStudent, BindingResult result) {
-
-		if(result.hasErrors()) {
-			return new ResponseEntity<>(createErrorMessage(result), HttpStatus.BAD_REQUEST);
-		}
-	
-		if (newStudent == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Student object is invalid."),
-					HttpStatus.BAD_REQUEST);
-		}		
-	
-		if(!(newStudent.getYear().equals(EYear.V.toString()) || newStudent.getYear().equals(EYear.VI.toString()) || 
-				newStudent.getYear().equals(EYear.VII.toString()) || newStudent.getYear().equals(EYear.VIII.toString())))
-			return new ResponseEntity<RESTError>(new RESTError("Year object is invalid."),HttpStatus.BAD_REQUEST);
-		
-//višak jer radim @valid a imaju @notnull:		
-		if (newStudent.getFirstName() == null || newStudent.getLastName() == null || newStudent.getDateOfBirth() == null
-				|| newStudent.getJmbg() == null || newStudent.getDateOfBirth() == null ||	newStudent.getDateEntered() == null
-				|| newStudent.getNumberOfDepartment() == null || newStudent.getYear() == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Teacher object is invalid."),
-					HttpStatus.BAD_REQUEST);
-		}	
-		
-// ako ne radi sa odeljenjem i razredom, promeniti studentDto da ima classId pa raditi findById(..):
-		ClassEntity schoolClass = classRepository.findByNumberOfDepartmentAndYear(newStudent.getNumberOfDepartment(), EYear.valueOf(newStudent.getYear()));
-		if(schoolClass == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Class not found."),	HttpStatus.NOT_FOUND);
-		}
-		
-		StudentEntity student = new StudentEntity();
-		student.setFirstName(newStudent.getFirstName());
-		student.setLastName(newStudent.getLastName());
-		student.setJmbg(newStudent.getJmbg());
-		student.setDateEntered(newStudent.getDateEntered());
-		student.setDateOfBirth(newStudent.getDateOfBirth());		
-		student.setSchoolClass(schoolClass);
-		student.setNote(newStudent.getNote());
-		studentRepository.save(student);
-		
-		UserEntity user = (UserEntity)student;
-/*ili:
-		UserEntity user = new UserEntity();
-		user.setFirstName(student.getFirstName());
-		user.setLastName(student.getLastName());
-		user.setJmbg(student.getJmbg());
-		user.setDateOfBirth(student.getDateOfBirth());
-
-		try {	
-			accountDao.createAndSaveAccount(newStudent.getUsername(), newStudent.getPassword(), user, EUserRole.ROLE_STUDENT);
-		}
-		catch (Exception e) {
-			studentRepository.deleteById(user.getUserId());
-			return new ResponseEntity<RESTError>(new RESTError("Account not created and student not recorded."),HttpStatus.INTERNAL_SERVER_ERROR);
-
-		}
-		return new ResponseEntity<StudentEntity>(student, HttpStatus.OK);	
-		
-	}
-*/	
 	
 	
 	@SuppressWarnings("null")
@@ -192,7 +127,6 @@ public class StudentController {
 				return new ResponseEntity<RESTError>(new RESTError("Class not found, student not created."),HttpStatus.NOT_FOUND);
 			}	
 		
-//*BAŠ I NEMA NEKOG SMISLA JER NEKO KO IMA DRUGU ROLU NE MOŽE DA BUDE I UČENIK ****
 			UserEntity user = userRepository.findByJmbg(newStudent.getJmbg());
 			if (user != null) {
 
@@ -206,33 +140,8 @@ public class StudentController {
 				logger.info("StudentController - addNewStudent - there is user with same jmbg .");
 				return new ResponseEntity<RESTError>(new RESTError("There is another person with same jmbg which can't be student and some other type of user at same time."),
 						HttpStatus.BAD_REQUEST);
-/*
-			if (!(user.getFirstName().equals(newStudent.getFirstName())	&& user.getLastName().equals(newStudent.getLastName()))) {// && user.getDateOfBirth().equals(newStudent.getDateOfBirth()))) {
-				return new ResponseEntity<RESTError>(new RESTError("There is another person with same jmbg."),
-						HttpStatus.BAD_REQUEST);
-			}
-
-			try {
-				studentRepository.insertNewStudent(newStudent.getDateEntered(), newStudent.getNote(), user.getUserId(), newStudent.getClassId());
-			} catch (Exception e) {
-				return new ResponseEntity<RESTError>(new RESTError("Query is invalid"), HttpStatus.BAD_REQUEST);
-
-			}
-
-			try {
-				accountDao.createAndSaveAccount(newStudent.getUsername(), newStudent.getPassword(), user,EUserRole.ROLE_STUDENT);
-			} catch (Exception e) {
-				studentRepository.deleteById(user.getUserId());
-				return new ResponseEntity<RESTError>(new RESTError("Account for student role not created and student not added"),
-						HttpStatus.INTERNAL_SERVER_ERROR);
-			}
-
-			return new ResponseEntity<>("Student was successfully recorded", HttpStatus.OK);
-*/
-				}
+	}
 	
-//**************************************************************************************			
-		
 			StudentEntity student = new StudentEntity();
 			student.setFirstName(newStudent.getFirstName());
 			student.setLastName(newStudent.getLastName());
@@ -317,13 +226,11 @@ public class StudentController {
 				student.setDateEntered(updateStudent.getDateEntered());
 			}
 
-// da li ovde  menjam odeljenje ili kroz poseban PUT? (napisan dole)
 			if(updateStudent.getClassId()!=null) {
 				ClassEntity newClass = classRepository.findById(updateStudent.getClassId()).orElse(null);
 				if (newClass != null)
 					student.setSchoolClass(newClass);
 				}
-//			
 			studentRepository.save(student);
 
 			logger.info("StudentController - updateStudent - finished.");
@@ -335,7 +242,6 @@ public class StudentController {
 		}
 	}
 	
-	// promena odeljenja:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/change-class/{classId}")
 //	@JsonView(Views.Admin.class)
@@ -355,13 +261,7 @@ public class StudentController {
 				return new ResponseEntity<RESTError>(new RESTError("Class with provided ID not found."),
 						HttpStatus.NOT_FOUND);
 			}
-/*DA LI TREBA OMOGUĆITI SAMO PROMENU ODELJENJA NA NIVOU ISTOG RAZREDA???
-			if(!student.getSchoolClass().getYear().equals(newClass.getYear())) {
-				logger.info("StudentController - changeClassOfStudent - class object is invalid.");
-				return new ResponseEntity<RESTError>(new RESTError("You can change department, not class."),
-						HttpStatus.BAD_REQUEST);	
-			}
-*/		
+
 			student.setSchoolClass(newClass);		
 			studentRepository.save(student);
 		
@@ -375,7 +275,6 @@ public class StudentController {
 		}
 	}
 	
-	// dodavanje roditelja:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}/add-parent/{parentId}")
 //	@JsonView(Views.Admin.class)
@@ -397,8 +296,6 @@ public class StudentController {
 		
 			student.getParents().add(parent);
 			studentRepository.save(student);
-			//	parentRepository.save(parent);
-
 			logger.info("StudentController - addParentToStudent - finished.");
 			return new ResponseEntity<ParentEntity>(parent, HttpStatus.OK);
 		}
@@ -409,7 +306,6 @@ public class StudentController {
 	}
 
 	
-//ne dozvoli brisanje ako ima account a dobio ga je čim je kreiran:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -423,40 +319,33 @@ public class StudentController {
 				return new ResponseEntity<RESTError>(new RESTError("Student with provided ID not found."),
 					HttpStatus.NOT_FOUND);
 			}
-			//provera da li neko ocenjivanje referencira tog učenika:		
 			Iterable<GradingEntity> gradings = gradingRepository.findAll();
 			for(GradingEntity grading : gradings) {
 				if(grading.getStudent().equals(student)) {
 					logger.info("StudentController - deleteStudent - student cannot be deleted because some grading has a reference to it.");
 					return new ResponseEntity<RESTError>(new RESTError("A student cannot be deleted because some grading has a reference to it"),
 							HttpStatus.OK);
-							//HttpStatus.BAD_REQUEST);
 				}
 			}
 		
-			//provera da li neko od roditelja referencira tog učenika:
 			Iterable<ParentEntity> parents = parentRepository.findAll();
 			for(ParentEntity parent : parents) {
 				if(parent.getStudents().contains(student)) {
 					logger.info("StudentController - deleteStudent - cannot delete student because he is child of some parent.");
 					return new ResponseEntity<RESTError>(new RESTError("A student cannot be deleted because some parent has a reference to it"),
 							HttpStatus.OK);
-							//HttpStatus.BAD_REQUEST);
 				}
 			}
 		
-			// provera da li neko odeljenje referencira tog učenika:
 			Iterable<ClassEntity> classes = classRepository.findAll();
 			for (ClassEntity schoolClass : classes) {
 				if (schoolClass.getStudents().contains(student)) {
 					logger.info("StudentController - deleteStudent - cannot delete student because some class has that student .");
 					return new ResponseEntity<RESTError>(new RESTError("A student cannot be deleted because some school class has a reference to it"),							
 							HttpStatus.BAD_REQUEST);
-					//return new ResponseEntity<RuntimeException>(new RuntimeException("A student cannot be deleted because some school class has a reference to it"), HttpStatus.BAD_REQUEST);
 				}
 			}
 		
-//provera da li je to korisnik nekog naloga:
 			if(accountRepository.findByUserAndRole((UserEntity)student, EUserRole.ROLE_STUDENT)!=null) {
 				logger.info("StudentController - deleteStudent - cannot delete student becouse hi had an account.");
 				return new ResponseEntity<RESTError>(new RESTError("The student have account so you can't delete him."),HttpStatus.NOT_FOUND);
@@ -474,7 +363,6 @@ public class StudentController {
 	}
 
 	
-//brisanje učenika i naloga	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "delete/{id}")
 //	@JsonView(Views.Admin.class)
@@ -488,7 +376,6 @@ public class StudentController {
 				return new ResponseEntity<RESTError>(new RESTError("Student with provided ID not found."),
 					HttpStatus.NOT_FOUND);
 			}
-			//provera da li neko ocenjivanje referencira tog učenika:		
 			Iterable<GradingEntity> gradings = gradingRepository.findAll();
 			for(GradingEntity grading : gradings) {
 				if(grading.getStudent().equals(student)) {
@@ -497,8 +384,6 @@ public class StudentController {
 						HttpStatus.BAD_REQUEST);
 				}
 			}
-		
-			//provera da li neko od roditelja referencira tog učenika:
 			Iterable<ParentEntity> parents = parentRepository.findAll();
 			for(ParentEntity parent : parents) {
 				if(parent.getStudents().contains(student)) {
@@ -507,8 +392,7 @@ public class StudentController {
 						HttpStatus.BAD_REQUEST);
 				}
 			}
-		
-			// provera da li neko odeljenje referencira tog učenika:
+
 			Iterable<ClassEntity> classes = classRepository.findAll();
 			for (ClassEntity schoolClass : classes) {
 				if (schoolClass.getStudents().contains(student)) {
@@ -539,9 +423,7 @@ public class StudentController {
 				logger.info("AdministratorController - deleteStudentAndAccount - Can't delete account from accountRepository.");
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			
-	//		studentRepository.deleteById(id);
-		
+
 			logger.info("StudentController - deleteStudentAndAccount - finished.");
 			return new ResponseEntity<StudentEntity>(student, HttpStatus.OK);
 		}
@@ -551,11 +433,7 @@ public class StudentController {
 		}
 	}
 
-	
-	
-	
-//front
-	
+
 	@Secured({"ROLE_ADMIN","ROLE_PARENT"})
 	@RequestMapping(method = RequestMethod.GET, value = "/by-parent/{parentId}")
 //	@JsonView(Views.Admin.class)
@@ -599,9 +477,6 @@ public class StudentController {
 				
 				ArrayList<StudentEntity> students = new ArrayList();
 				students.addAll( schoolClass.getStudents());
-	/*			for(StudentEntity student : schoolClass.getStudents())
-					students.add(student);*/
-				
 				logger.info("StudentController - findStudentsBySchoolClassId - finished.");
 				return new ResponseEntity<Iterable<StudentEntity>>(students, HttpStatus.OK);
 			}
@@ -612,34 +487,6 @@ public class StudentController {
 	}
 	
 	
-	//front:
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-// da li je ok:	
-	//deaktivacija uz cascadetype = All:(treba na svim vezama u entitetima stavit CascadeType.All)
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 	@JsonView(Views.Admin.class)

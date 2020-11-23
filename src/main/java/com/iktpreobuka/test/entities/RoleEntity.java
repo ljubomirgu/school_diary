@@ -32,11 +32,6 @@ public class RoleEntity {
 	@Column(name = "role")
 	@NotNull(message = "User role must be provided.")
 	private EUserRole userRole;
-/*
-	@JsonIgnore
-	@OneToMany(mappedBy = "role", fetch = FetchType.LAZY, cascade = { CascadeType.REFRESH })
-	private List<AccountEntity> accounts = new ArrayList<>();
-*/
 	@Version
 	private Integer version;
 
@@ -48,7 +43,6 @@ public class RoleEntity {
 		super();
 		this.roleId = roleId;
 		this.userRole = userRole;
-//		this.accounts = accounts;
 		this.version = version;
 	}
 
@@ -67,15 +61,6 @@ public class RoleEntity {
 	public void setUserRole(EUserRole userRole) {
 		this.userRole = userRole;
 	}
-/*
-	public List<AccountEntity> getAccounts() {
-		return accounts;
-	}
-
-	public void setAccounts(List<AccountEntity> accounts) {
-		this.accounts = accounts;
-	}
-*/
 	public Integer getVersion() {
 		return version;
 	}

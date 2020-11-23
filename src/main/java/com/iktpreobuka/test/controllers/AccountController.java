@@ -47,29 +47,6 @@ public class AccountController {
 	@Autowired
 	private UserRepository userRepository;
 	
-/*	
-	@Autowired
-	private AdministratorRepository administratorRepository;
-	@Autowired
-	private ParentRepository parentRepository;
-	@Autowired
-	private TeacherRepository teacherRepository;
-	@Autowired
-	private StudentRepository studentRepository;
-	
-/*  @Autowired
-	private RoleRepository roleRepository;
-	
-	@Autowired
-	AccountCustomValidator accountValidator;
-	
-	// ???? :
-	@InitBinder
-	protected void initBinder(final WebDataBinder binder) {
-		binder.addValidators(accountValidator);
-	}
- */
-	
 	private final Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 
 	
@@ -104,8 +81,6 @@ public class AccountController {
 		}
 	}
 
-// da li nije više potrebna POST jer se account kreira prilikom unosa novog Usera?:
-//da bi radilo treba skinuti da je user @notnull u accountEntity i accountDto:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST)
 //	@JsonView(Views.Admin.class)
@@ -128,22 +103,11 @@ public class AccountController {
  				|| newAccount.getRole().equals(EUserRole.ROLE_STUDENT.toString()) || newAccount.getRole().equals(EUserRole.ROLE_PARENT.toString())))
 			return new ResponseEntity<RESTError>(new RESTError("Incorected role"),HttpStatus.BAD_REQUEST);
 
-//		AccountEntity account = new AccountEntity(newAccount.getUsername(),newAccount.getPassword(), EUserRole.valueOf(newAccount.getRole()));
 
  		AccountEntity account = new AccountEntity();
 		account.setUsername(newAccount.getUsername());
 		account.setPassword(Encryption.getPassEncoded(newAccount.getPassword()));
 		
-/*kako se account kreira pri samom kreiranju korisnika, ovo ne koristimo, eventualno da posotji neki korisnik bez 		
- * naloga, tada treba zakomentarisati prvi red posle komentara - account.setUser(user), a ovo odkomentarisati
- * p.s. treba odkomentarisati i u accountDto polje private Integer userId:
-		UserEntity user = userRepository.findById(newAccount.getUserId()).orElse(null);
-		if(user == null) {
-			return new ResponseEntity<RESTError>(new RESTError("User with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-		}				
-		account.setUser(user);
-*/
 		account.setUser(null);
 
 		account.setRole(EUserRole.valueOf(newAccount.getRole()));
@@ -158,46 +122,6 @@ public class AccountController {
 		return result.getAllErrors().stream().map(ObjectError::getDefaultMessage).collect(Collectors.joining(" "));
 	}
 
-/*	STARI PUT KOJI NE RADI SA DTO:
-// šta sve može da se menja:
-	@Secured("ROLE_ADMIN")
-	@JsonView(Views.Admin.class)
-	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
-	public ResponseEntity<?> updateAccount(@PathVariable Integer id, @RequestBody AccountEntity updateAccount) {
-		logger.info("AccountController - updateAccount - starts.");
-		
-		AccountEntity account = accountRepository.findById(id).orElse(null);
-
-		if (account == null || updateAccount == null) {
-			return new ResponseEntity<RESTError>(new RESTError("Account with provided ID not found."),
-					HttpStatus.NOT_FOUND);
-		}
-
-		if (updateAccount.getUsername() != null && !updateAccount.getUsername().equals(" ") && !updateAccount.getUsername().equals("")) {
-			account.setUsername(updateAccount.getUsername());
-		}
-		if (updateAccount.getPassword() != null && !updateAccount.getPassword().equals(" ") && !updateAccount.getPassword().equals("")) {
-			account.setPassword(updateAccount.getPassword());
-		}
-		if(updateAccount.getUser() != null)
-			account.setUser(updateAccount.getUser());
-		
-		if(updateAccount.getRole() != null && (updateAccount.getRole() == EUserRole.ROLE_ADMIN || updateAccount.getRole() == EUserRole.ROLE_PARENT 
-				|| updateAccount.getRole() == EUserRole.ROLE_STUDENT || updateAccount.getRole() == EUserRole.ROLE_TEACHER))
-			account.setRole(updateAccount.getRole());
-		
-		if(updateAccount.getIsActive() != account.getIsActive())
-			account.setIsActive(updateAccount.getIsActive());
-		
-//		Integer index = account.getUser().getAccounts().indexOf(account); BESPOTREBNO
-		accountRepository.save(account);
-//		account.getUser().getAccounts().set(index, account);  BESPOTREBNO	
-
-		logger.info("AccountController - updateAccount - finished.");
-		return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-
-	}
-*/
 
 	@Secured("ROLE_ADMIN")
 //	@JsonView(Views.Admin.class)
@@ -242,94 +166,7 @@ public class AccountController {
 		}
 	}
 
-//KAKO SE PRI KREIRANJU USER-A KREIRA I NJEGOV NALOG, BRISANJE NALOGA SE SVODI NA BRISANJE TOG USERA I ODMAH SE BRIŠE I NJEGOV NALOG (RADI ZA ADMINISTRATORA)
-	
-/* šta sve može da se menja:
-		@Secured("ROLE_ADMIN")
-		@JsonView(Views.Admin.class)
-		@RequestMapping(method = RequestMethod.PUT, value = "/all-change/{id}")
-		public ResponseEntity<?> updateAccount(@Valid  @RequestBody AccountDto updateAccount, BindingResult result, @PathVariable Integer id) {
-			logger.info("AccountController - updateAccount - starts.");
-			try {
-				AccountEntity account = accountRepository.findById(id).orElse(null);
 
-				if (account == null || updateAccount == null) {
-					logger.info("AccountController - updateAccount - account not found.");
-					return new ResponseEntity<RESTError>(new RESTError("Account with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-				}
-
-				if (updateAccount.getUsername() != null && !updateAccount.getUsername().equals(" ") && !updateAccount.getUsername().equals("")) {
-					account.setUsername(updateAccount.getUsername());
-				}
-				if (updateAccount.getPassword() != null && !updateAccount.getPassword().equals(" ") && !updateAccount.getPassword().equals("")) {
-					account.setPassword(Encryption.getPassEncoded(updateAccount.getPassword()));
-				}
-		
-				if(updateAccount.getUserId()!=null) {
-					UserEntity user = userRepository.findById(updateAccount.getUserId()).orElse(null);
-					if(user != null)
-					account.setUser(user);
-				}
-				if(updateAccount.getRole() != null && (updateAccount.getRole() == EUserRole.ROLE_ADMIN.toString()
-						|| updateAccount.getRole() == EUserRole.ROLE_PARENT.toString() 
-						|| updateAccount.getRole() == EUserRole.ROLE_STUDENT.toString() || updateAccount.getRole() == EUserRole.ROLE_TEACHER.toString()))
-					account.setRole(EUserRole.valueOf(updateAccount.getRole()));
-			
-				if(updateAccount.getIsActive() != account.getIsActive())
-					account.setIsActive(updateAccount.getIsActive());
-				accountRepository.save(account);
-
-				logger.info("AccountController - updateAccount - finished.");
-				return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-			}
-			catch (Exception e){
-				logger.info("AccountController - updateAccount - internal server error.");
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-				
-			}
-		}
-*/		
-
-/*
-//ova put metoda je kao gornja ako se gore menjaju samo username i/ili password:
-	@Secured("ROLE_ADMIN")
-	@JsonView(Views.Admin.class)
-	@RequestMapping(method = RequestMethod.PUT, value = "/username-password/{id}")
-	public ResponseEntity<?> updateAccountsUsernamePassword(@PathVariable Integer id, @RequestParam String username,
-			@RequestParam String password) {
-		logger.info("AccountController - updateAccountsUsernamePassword - starts.");
-		try {
-			AccountEntity account = accountRepository.findById(id).get();
-
-			if (account == null) {
-				logger.info("AccountController - updateAccountsUsernamePassword - account not found.");
-				return new ResponseEntity<RESTError>(new RESTError("Account with provided ID not found."),
-						HttpStatus.NOT_FOUND);
-			}
-
-			if (StringUtils.isNotBlank(username)) {
-				account.setUsername(username);
-			}
-
-			if (StringUtils.isNotBlank(password)) {
-				account.setPassword(Encryption.getPassEncoded(password));
-			}
-			accountRepository.save(account);
-
-			logger.info("AccountController - updateAccountsUsernamePassword - starts.");
-			return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-		}
-		catch (Exception e) {
-			logger.info("AccountController - updateAccountsUsernamePassword - intrenal server error.");
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-
-		}
-	}
-*/	
-
-		
-// brisanje kao deaktivacija:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/deactivate/{id}")
 //	@JsonView(Views.Admin.class)
@@ -356,9 +193,7 @@ public class AccountController {
 		}
 	}
 
-	
-// brisanje (ako niko ne referencira taj nalog, što je nemoguće jer ga kreiram istovremeno sa kreiranjem korisnika):
-//  treba sprečiti da ulogovani admin sam sebi obriše nalog - Principal proncipal
+
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -371,7 +206,6 @@ public class AccountController {
 			return new ResponseEntity<RESTError>(new RESTError("Account with provided ID not found."),
 					HttpStatus.NOT_FOUND);
 		}
-		// ukoliko ni jedan entitet ne referencira to što brišemo, može se obrisati:
 		Iterable<UserEntity> users = userRepository.findAll();
 		for (UserEntity user : users) {
 			if (user.getAccounts().contains(account))
@@ -379,73 +213,6 @@ public class AccountController {
 				return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),
 						HttpStatus.BAD_REQUEST);
 		}
-
-// raskidanje veza pri brisanju dovodi do nekonzistentnosti baze:
-/*prvo se briše taj nalog sa druge strane veze:		
-		UserEntity user = account.getUser();
-		user.getAccounts().remove(account);
-		userRepository.save(user);
-*/
-/*	provera za brisanje #2	
-  		if(account.getRole() == EUserRole.ROLE_ADMIN)
-			try {
-				AdministratorEntity admin = administratorRepository.findById(account.getUser().getUserId()).orElse(null);
-				if(administratorRepository.findById(account.getUser().getUserId()).orElse(null)!= null)
-					return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-			}
-			catch(NullPointerException e) {
-				accountRepository.deleteById(id);
-				return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-			}
-
-		if(account.getRole() == EUserRole.ROLE_PARENT)
-			try {
-//				ParentEntity parent = parentRepository.findById(account.getUser().getUserId()).orElse(null);
-				if(parentRepository.findById(account.getUser().getUserId()).orElse(null)!= null)
-					return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-			}
-			catch(NullPointerException e) {
-				accountRepository.deleteById(id);
-				return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-			}		
-
-		if(account.getRole() == EUserRole.ROLE_STUDENT)
-			try {
-//				StudentEntity student = studentRepository.findById(account.getUser().getUserId()).orElse(null);
-				if(studentRepository.findById(account.getUser().getUserId()).orElse(null)!= null)
-					return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-			}
-			catch(NullPointerException e) {
-				accountRepository.deleteById(id);
-				return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-			}
-
-		if(account.getRole() == EUserRole.ROLE_TEACHER)
-			try {
-//				TeacherEntity teacher = teacherRepository.findById(account.getUser().getUserId()).orElse(null);
-				if(teacherRepository.findById(account.getUser().getUserId()).orElse(null)!= null)
-					return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-			}
-			catch(NullPointerException e) {
-				accountRepository.deleteById(id);
-				return new ResponseEntity<AccountEntity>(account, HttpStatus.OK);
-			}
-*/
-
-/*	provera za brisanje #1	
-		if(account.getRole() == EUserRole.ROLE_ADMIN)
-			if(administratorRepository.findById(account.getUser().getUserId()).orElse(null)== null)
-				return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-		if(account.getRole() == EUserRole.ROLE_PARENT)
-			if(parentRepository.findById(account.getUser().getUserId()).orElse(null)== null)
-				return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-		if(account.getRole() == EUserRole.ROLE_STUDENT)
-			if(studentRepository.findById(account.getUser().getUserId()).orElse(null)== null)
-				return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-		if(account.getRole() == EUserRole.ROLE_TEACHER)
-			if(teacherRepository.findById(account.getUser().getUserId()).orElse(null)== null)
-				return new ResponseEntity<RESTError>(new RESTError("There is a user whose account is this so you can't delete it.."),HttpStatus.NOT_FOUND);
-*/
 		
 		accountRepository.deleteById(id);
 	

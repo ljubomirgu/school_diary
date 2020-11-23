@@ -52,7 +52,7 @@ public class LectureController {
 
 
 	@Secured("ROLE_ADMIN")
-	@RequestMapping(method = RequestMethod.GET)//, value="/admin")
+	@RequestMapping(method = RequestMethod.GET)
 	@JsonView(Views.Admin.class)
 	public ResponseEntity<?> getAllLectures() {
 		logger.info("LectureController - getAllLectures - starts.");
@@ -84,7 +84,6 @@ public class LectureController {
 		}
 	}
 
-//dodavanje:
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.POST)
 //	@JsonView(Views.Admin.class)
@@ -113,7 +112,6 @@ public class LectureController {
 						HttpStatus.BAD_REQUEST);
 			}
 		
-//sprecavam duplikate, može li ista kombinacija nastavnik - predmet -odeljenje u istoj školskoj godini?			
 			LectureEntity lecturee = lectureRepository.findBySchoolClassAndSubjectAndTeacher(schoolClass, subject,teacher);
 			if(lecturee != null) {
 				logger.info("LectureController - addLecture - lecture already exists.");
@@ -122,7 +120,6 @@ public class LectureController {
 
 			if (teacher.getSubjects().contains(subject)) {
 				if (subject.getYears().contains(schoolClass.getYear())) {
-// treba li ovo proveravati i da li je ok: if(lectureRepository.findBySchoolClassAndSubject(schoolClass, subject) == null)-NE TREBA 
 
 					LectureEntity lecture = new LectureEntity();
 					lecture.setSchoolClass(schoolClass);
@@ -143,8 +140,6 @@ public class LectureController {
 				return new ResponseEntity<RESTError>(new RESTError("That is not teachers' subject."), HttpStatus.BAD_REQUEST);
 			}
 
-
-//		return new ResponseEntity<RESTError>(new RESTError("Lecture object is invalid."), HttpStatus.BAD_REQUEST);
 		}
 		catch (Exception e){
 			logger.info("LectureController - addLecture - internal server error.");
@@ -157,7 +152,6 @@ public class LectureController {
 					.collect(Collectors.joining(" "));
 	}
 	
-// ***
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.PUT, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -178,7 +172,6 @@ public class LectureController {
 			if(updateLecture.getClassId()==null && updateLecture.getTeacherId()==null && updateLecture.getSubjectId()==null)
 				return new ResponseEntity<RESTError>(new RESTError("Update lecture object is invalid."), HttpStatus.BAD_REQUEST);
 
-//kako sam već napravio ove if-if kombnacije a kasnije ulaz prebacio na DTO, te kako ne bi bilo NPE ako je nešto u DTO null, ovo je primitivno rešenje:
 			ClassEntity schoolClass = new ClassEntity();
 			if(updateLecture.getClassId()==null)
 				schoolClass = null;
@@ -196,9 +189,7 @@ public class LectureController {
 				subject=null;	
 			else
 				subject = subjectRepository.findById(updateLecture.getSubjectId()).orElse(null);
-		
-//		SubjectEntity subject = updateLecture.getSubject();
-		
+				
 			ClassEntity oldSchoolClass = lecture.getSchoolClass();
 			TeacherEntity oldTeacher = lecture.getTeacher();
 			SubjectEntity oldSubject = lecture.getSubject();
@@ -290,7 +281,6 @@ public class LectureController {
 		}
 	}
 	
-//brisanje:	
 	@Secured("ROLE_ADMIN")
 	@RequestMapping(method = RequestMethod.DELETE, value = "/{id}")
 //	@JsonView(Views.Admin.class)
@@ -304,7 +294,6 @@ public class LectureController {
 						HttpStatus.NOT_FOUND);
 			}
 				
-//provera da li neko od nastavnika referencira taj objekat predaje:
 			Iterable<TeacherEntity> teachers = teacherRepository.findAll();
 			for (TeacherEntity teacher : teachers) {
 				if (teacher.getLectures().contains(lecture))
@@ -312,7 +301,6 @@ public class LectureController {
 							HttpStatus.BAD_REQUEST);
 			}
 				
-//provera da li neko od nastavnika referencira  taj objekat predaje:
 			Iterable<SubjectEntity> subjects = subjectRepository.findAll();
 			for (SubjectEntity subject : subjects) {
 				if (subject.getLectures().contains(lecture))
@@ -320,7 +308,6 @@ public class LectureController {
 							HttpStatus.BAD_REQUEST);		
 			}
 		
-//provera da li neko predavanje referencira  taj objekat predaje:		
 			Iterable<ClassEntity> classes = classRepository.findAll();
 			for(ClassEntity schoolClass : classes) {
 				if(schoolClass.getLectures().contains(lecture))
@@ -337,39 +324,8 @@ public class LectureController {
 			logger.info("LectureController - deleteLecture - internal server error.");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
-		
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		
-/*	NE MOŽE - NEKONZISTENTNOST BAZE:	
-//pre brisanja Lecture obrisati gde god se pojavljuje, ovako nekako i može li bez toga za projekat:
-		SubjectEntity subject = lecture.getSubject();
-		subject.getLectures().remove(subject.getLectures().indexOf(lecture));
-		subjectRepository.save(subject);
-		
-		TeacherEntity teacher = lecture.getTeacher();
-		teacher.getLectures().remove(teacher.getLectures().indexOf(lecture));
-		teacherRepository.save(teacher);
-		
-		ClassEntity schoolClass = lecture.getSchoolClass();
-		schoolClass.getLectures().remove(schoolClass.getLectures().indexOf(lecture));
-		classRepository.save(schoolClass);
 
-*/		
-	
 	}	
-	
-	
-//**front:
-	
 
 	@Secured({"ROLE_ADMIN", "ROLE_TEACHER"})
 	@RequestMapping(method = RequestMethod.GET, value = "/by-teacher/{teacherId}")
@@ -460,9 +416,6 @@ public class LectureController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
-
-	
 	
 	
 }
